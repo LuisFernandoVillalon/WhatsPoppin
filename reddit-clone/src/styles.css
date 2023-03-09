@@ -1,3 +1,9 @@
+body {
+    margin: 0;
+    padding: 0;
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+    height: 100vh;
+}
 .logo-container {
     display: flex;
     align-items: center;
@@ -9,7 +15,6 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    font-family: Verdana, Geneva, Tahoma, sans-serif;
     font-size: 1.5rem;
     background-color: white;
 }
@@ -23,9 +28,11 @@
     border: thin solid black;
     padding: 0.25%;
     border-radius: 50px;
+    width: 50%;
 }
 .search-post {
     border-style: none;
+    width: 100%;
 }
 .search-post:focus {
     outline: none;
@@ -34,6 +41,7 @@
     display: flex;
     align-items: center;
     gap: 15px;
+    margin-right: 2.5%;
 }
 .login-button {
     background-color: red;
@@ -45,4 +53,45 @@
 }
 .login-button:hover {
     cursor: pointer;
+}
+.content-container {
+    background-color: rgb(217, 223, 229);
+    display: grid;
+    grid-template-columns: 2fr 1fr ;
+    padding-left: 15%;
+    padding-right: 25%;
+}
+.about-container {
+    background-color: white;
+    margin-top: 10%;
+    margin-bottom: 10%;
+    padding: 2.5%;
+    font-size: 80%;
+}
+.about-title {
+    font-size: 0.75rem;
+    font-weight: bold;
+}
+a {
+    text-decoration: none;
+}
+.board-section-container {
+    background-color: white;
+    display: flex;
+    align-items: center;
+    justify-content: space-evenly;
+    margin-top: 5%;
+    margin-right: 5%;
+    padding: 1.5%;
+}
+.board-section {
+    display: flex;;
+    align-items: center;
+    gap: 5px;
+    color: rgb(111, 111, 111);
+    font-weight: bold;
+}
+.board-section:hover {
+    cursor: pointer;
+    color: rgb(1, 120, 210);
 }
