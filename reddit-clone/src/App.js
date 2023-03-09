@@ -1,12 +1,13 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import MessageBoard from "./pages/MessageBoard";
 
 function App() {
   return (
     <div>
-      <BrowserRouter path="/javascript-final-project---the-odin-project">
+      <BrowserRouter path="/">
         <Routes>
-          <Route path="/javascript-final-project---the-odin-project" element={<Home/>}/>
+          <Route path="/" element={<MessageBoard />}/>
         </Routes>
       </BrowserRouter>
     </div>

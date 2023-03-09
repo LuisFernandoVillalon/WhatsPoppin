@@ -1,0 +1,48 @@
+.logo-container {
+    display: flex;
+    align-items: center;
+}
+.logo-container:hover {
+    cursor: pointer;
+}
+.header-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+    font-size: 1.5rem;
+    background-color: white;
+}
+.logo {
+    width: 4rem;
+}
+.search-container {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    border: thin solid black;
+    padding: 0.25%;
+    border-radius: 50px;
+}
+.search-post {
+    border-style: none;
+}
+.search-post:focus {
+    outline: none;
+}
+.login-container {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+.login-button {
+    background-color: red;
+    border-radius: 15px;
+    color: white;
+    border-color: red;
+    border-width: 5px;
+    font-size: 1.25rem;
+}
+.login-button:hover {
+    cursor: pointer;
+}
