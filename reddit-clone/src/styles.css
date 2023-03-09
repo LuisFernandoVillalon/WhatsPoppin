@@ -65,7 +65,7 @@ body {
     background-color: white;
     margin-top: 10%;
     margin-bottom: 10%;
-    padding: 2.5%;
+    padding: 4.5%;
     font-size: 80%;
 }
 .about-title {
@@ -94,4 +94,56 @@ a {
 .board-section:hover {
     cursor: pointer;
     color: rgb(1, 120, 210);
+}
+.individual-post {
+    background-color: white;
+    margin-top: 2.5%;
+    margin-right: 5%;
+    padding: 2.5%;
+    display: grid;
+    grid-template-columns: 0.25fr 1fr;
+}
+.first-column {
+    font-size: 1rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-left: -85%;
+}
+.upArrow:hover {
+    cursor: pointer;
+    color: red;
+    background-color: lightgray;
+    border-radius: 5px;
+}
+.downArrow:hover {
+    cursor: pointer;
+    color: rgb(1, 120, 210);
+    background-color: lightgray;
+    border-radius: 5px;
+}
+.post-user {
+    font-size: 0.75rem;
+    color:rgb(111, 111, 111);
+    margin-left: -15%;
+}
+.post-title {
+    margin-left: -15%;
+}
+.post-comments {
+    margin-left: -15%;
+    margin-top: 15%;
+    font-size: 0.75rem;
+    color:rgb(111, 111, 111);
+    padding: 2.5%;
+    margin-bottom: -10px;
+    display: flex;
+    align-items: center;
+}
+.post-comments:hover {
+    width: 26%;
+    background-color: lightgray;
+    border-radius: 5px;
+    cursor: pointer;
+    padding: 2.5%;
 }

@@ -5,7 +5,7 @@
         "voteAmount": 0,
         "title": "Is Ash really the best to ever was?",
         "content": "Let me know what you think.",
-        "comments": []
+        "comments": 0
     }, 
     "1": {
         "user": "digi-Tamer",
@@ -13,7 +13,7 @@
         "voteAmount": 0,
         "title": "Controversional Opinion",
         "content": "I  love putting ketchup on my scrambled eggs.",
-        "comments": []
+        "comments": 0
     }, 
     "2": {
         "user": "IluvChowder",
@@ -21,6 +21,6 @@
         "voteAmount": 0,
         "title": "Why did the chicken cross the road?",
         "content": "idk ask the chicken",
-        "comments": []
+        "comments": 0
     }
-  }
+}
