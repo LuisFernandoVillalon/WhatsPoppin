@@ -59,7 +59,8 @@ body {
     display: grid;
     grid-template-columns: 2fr 1fr ;
     padding-left: 15%;
-    padding-right: 25%;
+    padding-right: 15%;
+    padding-bottom: 4%;
 }
 .about-container {
     background-color: white;
@@ -74,6 +75,9 @@ body {
 }
 a {
     text-decoration: none;
+}
+.about-link {
+    color: red;
 }
 .board-section-container {
     background-color: white;
@@ -99,9 +103,9 @@ a {
     background-color: white;
     margin-top: 2.5%;
     margin-right: 5%;
-    padding: 2.5%;
+    padding: 3%;
     display: grid;
-    grid-template-columns: 0.25fr 1fr;
+    grid-template-columns: 0.05fr 1fr;
 }
 .first-column {
     font-size: 1rem;
@@ -115,35 +119,112 @@ a {
     color: red;
     background-color: lightgray;
     border-radius: 5px;
+    padding: 5%;
 }
 .downArrow:hover {
     cursor: pointer;
     color: rgb(1, 120, 210);
     background-color: lightgray;
     border-radius: 5px;
+    padding: 5%;
 }
 .post-user {
     font-size: 0.75rem;
     color:rgb(111, 111, 111);
     margin-left: -15%;
+    margin-bottom: 2.5%;
 }
 .post-title {
     margin-left: -15%;
+    font-weight: 500;
+    font-size: 1.15rem;
 }
 .post-comments {
     margin-left: -15%;
-    margin-top: 15%;
+    margin-top: 5%;
     font-size: 0.75rem;
     color:rgb(111, 111, 111);
     padding: 2.5%;
     margin-bottom: -10px;
     display: flex;
     align-items: center;
+    gap: 5px;
 }
 .post-comments:hover {
-    width: 26%;
+    width: 25%;
     background-color: lightgray;
     border-radius: 5px;
     cursor: pointer;
-    padding: 2.5%;
+}
+.post-image {
+    margin-top: 5%;
+    width: 50%;
+    align-self: center;
+    margin-left: -25%;
+}
+.second-column {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+    margin-left: 15%;
+}
+.post-link {
+    margin-top: 2.5%;
+    font-size: 0.85rem;
+    margin-left: -15%;
+    color: rgb(1, 120, 210);
+}
+.post-link-container {
+    display: flex;
+    justify-content: space-between;
+}
+.link-square {
+    border: thin solid rgb(1, 120, 210);
+    border-radius: 2.5px;
+    width: 25%;
+    cursor: pointer;
+}
+.link-in-box-container {
+    font-size: 0.75rem;
+    display: flex;
+    width: 100%;
+    justify-content: flex-end;
+    height: 100%;
+    align-items: flex-end;
+    margin-top: -48px;
+}
+.link-in-box {
+    color: white;
+    width: 13px;
+    border-radius: 1.5px;
+    background-color: rgb(1, 120, 210);
+    padding-left: 1.5%;
+    padding-top: 1.5%;
+    
+}
+.chain-in-square {
+    color:rgb(1, 120, 210);
+    font-size: 2.5rem;
+    position: relative;
+    top: 30%;
+    left: 40%;
+}
+.backtop-button-container {
+    margin-top: 2.5%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 4%;
+}
+.backtop-button {
+    background-color: rgb(1, 120, 210);
+    border-color: white;
+    border-width: 5px; 
+    color: white;
+    font-size: 1rem;
+    font-weight: bold;
+    padding: 1.5%;
+    border-radius: 25%;
+    cursor: pointer;
 }

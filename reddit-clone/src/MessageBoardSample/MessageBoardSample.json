@@ -1,26 +1,56 @@
 {
     "0": {
         "user": "pokemonMaster",
+        "type": "text",
         "timePosted": 0,
-        "voteAmount": 0,
+        "voteAmount": 3,
         "title": "Is Ash really the best to ever was?",
         "content": "Let me know what you think.",
         "comments": 0
     }, 
     "1": {
-        "user": "digi-Tamer",
+        "user": "IluvChowder",
+        "type": "link",
         "timePosted": 0,
         "voteAmount": 0,
-        "title": "Controversional Opinion",
-        "content": "I  love putting ketchup on my scrambled eggs.",
+        "title": "Check this page out! The Odin Project",
+        "content": "https://www.theodinproject.com/users/sign_in",
         "comments": 0
     }, 
     "2": {
-        "user": "IluvChowder",
+        "user": "solecae29",
+        "type": "link",
         "timePosted": 0,
-        "voteAmount": 0,
-        "title": "Why did the chicken cross the road?",
-        "content": "idk ask the chicken",
+        "voteAmount": 7,
+        "title": "Cool game I found, it takes a while for the images to load lol",
+        "content": "https://luisfernandovillalon.github.io/photo-tagging-top/",
+        "comments": 0
+    },
+    "3": {
+        "user": "KoolKid-93",
+        "type": "image",
+        "timePosted": 0,
+        "voteAmount": 15,
+        "title": "The Miracle of Life",
+        "content": "https://external-preview.redd.it/tESIBoDibdi3kLUq8A8V1ay6WyzcSSlyp1luMGzVJu8.jpg?auto=webp&v=enabled&s=9870e2c93daadd5f2141cb661a7ec633b13a0d7b",
+        "comments": 0
+    }, 
+    "4": {
+        "user": "foogetboutit",
+        "type": "text",
+        "timePosted": 0,
+        "voteAmount": 2,
+        "title": "I found an organic reccipe for sandwiches,",
+        "content": "I found it in my dreams, but I already forgot about it.",
+        "comments": 0
+    }, 
+    "5": {
+        "user": "digi-Tamer",
+        "type": "image",
+        "timePosted": 0,
+        "voteAmount": 1,
+        "title": "Controversional Opinion: I <3 DK",
+        "content": "https://mario.wiki.gallery/images/8/84/MPS_Donkey_Kong_Artwork.png",
         "comments": 0
     }
 }
