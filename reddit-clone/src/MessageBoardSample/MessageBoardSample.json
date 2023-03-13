@@ -2,7 +2,7 @@
     "0": {
         "user": "pokemonMaster",
         "type": "text",
-        "timePosted": 0,
+        "timePosted": "2020-03-12",
         "voteAmount": 3,
         "title": "Is Ash really the best to ever was?",
         "content": "Let me know what you think.",
@@ -11,7 +11,7 @@
     "1": {
         "user": "IluvChowder",
         "type": "link",
-        "timePosted": 0,
+        "timePosted": "2022-03-08",
         "voteAmount": 0,
         "title": "Check this page out! The Odin Project",
         "content": "https://www.theodinproject.com/users/sign_in",
@@ -20,7 +20,7 @@
     "2": {
         "user": "solecae29",
         "type": "link",
-        "timePosted": 0,
+        "timePosted": "2023-01-03",
         "voteAmount": 7,
         "title": "Cool game I found, it takes a while for the images to load lol",
         "content": "https://luisfernandovillalon.github.io/photo-tagging-top/",
@@ -29,7 +29,7 @@
     "3": {
         "user": "KoolKid-93",
         "type": "image",
-        "timePosted": 0,
+        "timePosted": "2023-02-10",
         "voteAmount": 15,
         "title": "The Miracle of Life",
         "content": "https://external-preview.redd.it/tESIBoDibdi3kLUq8A8V1ay6WyzcSSlyp1luMGzVJu8.jpg?auto=webp&v=enabled&s=9870e2c93daadd5f2141cb661a7ec633b13a0d7b",
@@ -38,7 +38,7 @@
     "4": {
         "user": "foogetboutit",
         "type": "text",
-        "timePosted": 0,
+        "timePosted": "2022-11-01",
         "voteAmount": 2,
         "title": "I found an organic reccipe for sandwiches,",
         "content": "I found it in my dreams, but I already forgot about it.",
@@ -47,7 +47,7 @@
     "5": {
         "user": "digi-Tamer",
         "type": "image",
-        "timePosted": 0,
+        "timePosted": "2023-03-11",
         "voteAmount": 1,
         "title": "Controversional Opinion: I <3 DK",
         "content": "https://mario.wiki.gallery/images/8/84/MPS_Donkey_Kong_Artwork.png",
