@@ -24,8 +24,7 @@ const firebaseConfig = {
 //     return update(ref(database), updates);
 // }
 
-export function getRecords({setMasterBoard}) { 
-
+export function getRecords({ setMasterBoard}) { 
   const board = ref(database, '/');
   onValue(board, (snapshot) => {
     const data = snapshot.val();

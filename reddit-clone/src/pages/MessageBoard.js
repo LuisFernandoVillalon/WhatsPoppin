@@ -5,7 +5,7 @@ import Content from "../components/Content";
 const MessageBoard = () => {
     return (
         <div>
-            <Header />
+            {/* <Header /> */}
             <Content />
         </div>
     )

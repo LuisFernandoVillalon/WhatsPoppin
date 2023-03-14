@@ -1,24 +1,27 @@
 import { BarChartFill, Newspaper, Clock, ArrowUp, ArrowDown, ChatSquare, BoxArrowUpRight, Link45deg } from 'react-bootstrap-icons'; 
-import { getRecords } from '../MessageBoardSample/firebaseData';
-import { useState, useEffect } from "react";
 
+import { useNavigate } from "react-router-dom";
+import uniqid from 'uniqid';
 
-const HomeBoard = () => {
-    const [masterBoard, setMasterBoard] = useState([]);
-    useEffect(() => {
-        getRecords({setMasterBoard});
-    }, [])
+const HomeBoard = (props) => {
+    // const [masterBoard, setMasterBoard] = useState([]);
+    // useEffect(() => {
+    //     getRecords({setMasterBoard});
+    // }, [])
     return (
-        <>
+        <div>
             <div className="board-section-container">
-                <div tabIndex="1" className="board-section" onClick={() => topBoard({masterBoard, setMasterBoard})}><BarChartFill/>Top</div>
-                <div tabIndex="2" className="board-section" onClick={() => newBoard({masterBoard, setMasterBoard})}><Newspaper/>New</div>
-                <div tabIndex="3" className="board-section" onClick={() => oldBoard({masterBoard, setMasterBoard})}><Clock/>Old</div>
+                <div tabIndex="1" className="board-section" onClick={() => topBoard({props})}><BarChartFill/>Top</div>
+                <div tabIndex="2" className="board-section" onClick={() => newBoard({props})}><Newspaper/>New</div>
+                <div tabIndex="3" className="board-section" onClick={() => oldBoard({props})}><Clock/>Old</div>
             </div>
+            <div>
              <MessageBoard 
-                masterBoard={masterBoard}
+                props={props}
+                key={uniqid()}
              />
-        </>
+             </div>
+        </div>
     )
 }
 
@@ -26,10 +29,12 @@ const backTop = () => {
     window.scrollTo(0, 0);
 }
 
-const MessageBoard = ({masterBoard}) => {
-    const boardList = masterBoard.map((currentPost) => (
+const MessageBoard = ({props}) => {
+    let mB = props.masterBoard;
+    const boardList = mB.map((currentPost) => (
         <IndividualPost 
             currentPost={currentPost}
+            props={props}
         />
 ))
     return (
@@ -40,24 +45,33 @@ const MessageBoard = ({masterBoard}) => {
     )
 }
 
+
+
 const IndividualPost = (props) => {
     const type = props.currentPost.type;
+
     if (type === "text") {
-       return ( <TextPost props={props} /> )
+       return ( <TextPost props={props} key={uniqid()}/> )
     } else if (type === "image") {
-        return ( <ImagePost props={props} /> )
+        return ( <ImagePost props={props} key={uniqid()} /> )
     } else if (type === "link") {
-        return ( <LinkPost props={props} /> )
+        return ( <LinkPost props={props} key={uniqid()} /> )
     }
 }
 
-const directLink = (props) => {
+export const directLink = (props) => {
     window.open(props);
 }
 
 const TextPost = ({props}) => {
+    const navigate = useNavigate();
+
+    const postRoute = (props) => {
+        props.props.setCurrentPost(props.currentPost);
+            navigate("/post");
+    }
     return (
-        <div className="individual-post">
+        <div className="individual-post"  onClick={() => postRoute(props)}>
         <div className="first-column">
              <ArrowUp className='upArrow'/>
              {props.currentPost.voteAmount}
@@ -72,23 +86,37 @@ const TextPost = ({props}) => {
     )
 }
 const ImagePost = ({props}) => {
+    const navigate = useNavigate();
+
+    const postRoute = (props) => {
+        props.props.setCurrentPost(props.currentPost);
+            navigate("/post");
+    }
     return (
-        <div className="individual-post">
+        <div className="individual-post" onClick={() => postRoute(props)}>
         <div className="first-column">
              <ArrowUp className='upArrow'/>
              {props.currentPost.voteAmount}
              <ArrowDown className='downArrow'/>
         </div>
         <div className="second-column">
-             <div className='post-user'>Posted by {props.currentPost.user}<TimePosted props={props}/></div>
+             <div className='post-user'>Posted by {props.currentPost.user}<TimePosted props={props} /></div>
              <div className='post-title'>{props.currentPost.title}</div>
-             <img src={props.currentPost.content} className="post-image"/>
-             <div className='post-comments'><ChatSquare /> {props.currentPost.comments} Comments</div>
+             <img alt="post" src={props.currentPost.content} className="post-image"/>
+             <div className='post-comments'><ChatSquare/> {props.currentPost.comments} Comments</div>
         </div>
      </div>
     )
 }
 const LinkPost = ({props}) => {
+
+    const navigate = useNavigate();
+
+    const postRoute = (props) => {
+        props.props.setCurrentPost(props.currentPost);
+            navigate("/post");
+    }
+
      let temp = props.currentPost.title;
       let tempArr = temp.split('');
      let truncated = [];
@@ -99,7 +127,7 @@ const LinkPost = ({props}) => {
      truncated.toString('');
     
     return (
-        <div className="individual-post-link">
+        <div className="individual-post-link"  onClick={() => postRoute(props)}>
             <div className="first-column">
                 <ArrowUp className='upArrow'/>
                 {props.currentPost.voteAmount}
@@ -109,7 +137,7 @@ const LinkPost = ({props}) => {
             <div className="second-column">
                     <div className='post-user'>Posted by {props.currentPost.user}<TimePosted props={props}/></div>
                     <div className='post-title-link'>{truncated}</div>
-                    <a  target="_blank" className='post-link' href={props.currentPost.content}>{props.currentPost.content}<BoxArrowUpRight/></a>
+                    <a  rel="noreferrer" target="_blank" className='post-link' href={props.currentPost.content}>{props.currentPost.content}<BoxArrowUpRight/></a>
                     <div className='post-comments'><ChatSquare /> {props.currentPost.comments} Comments</div>
             </div>
 
@@ -128,17 +156,17 @@ const LinkPost = ({props}) => {
     )
 }
 
-const topBoard = ({masterBoard, setMasterBoard}) => {
-    let temp = [...masterBoard];
+const topBoard = ({props}) => {
+    let temp = [...props.masterBoard];
     temp.sort((a, b) => {
         return b.voteAmount - a.voteAmount;
     });
-    setMasterBoard(temp);
+    props.setMasterBoard(temp);
 }
-const newBoard = ({masterBoard, setMasterBoard}) => {
-    let temp = [...masterBoard];
-    for (let i = 0; i < masterBoard.length; ++i) {
-        masterBoard[i].timePosted = masterBoard[i].timePosted.split('-').join('');
+const newBoard = ({props}) => {
+    let temp = [...props.masterBoard];
+    for (let i = 0; i < props.masterBoard.length; ++i) {
+        props.masterBoard[i].timePosted = props.masterBoard[i].timePosted.split('-').join('');
     }
     temp.sort((a, b) => {
         return b.timePosted - a.timePosted;
@@ -161,12 +189,12 @@ const newBoard = ({masterBoard, setMasterBoard}) => {
     for (let i = 0; i < indvNormal.length; ++i) {
             temp[i].timePosted = indvNormal[i].join('');
     }
-      setMasterBoard(temp);
+      props.setMasterBoard(temp);
 }
-const oldBoard = ({masterBoard, setMasterBoard}) => {
-    let temp = [...masterBoard];
-    for (let i = 0; i < masterBoard.length; ++i) {
-        masterBoard[i].timePosted = masterBoard[i].timePosted.split('-').join('');
+const oldBoard = ({props}) => {
+    let temp = [...props.masterBoard];
+    for (let i = 0; i < props.masterBoard.length; ++i) {
+        props.masterBoard[i].timePosted = props.masterBoard[i].timePosted.split('-').join('');
     }
     temp.sort((a, b) => {
         return a.timePosted - b.timePosted;
@@ -189,10 +217,10 @@ const oldBoard = ({masterBoard, setMasterBoard}) => {
     for (let i = 0; i < indvNormal.length; ++i) {
             temp[i].timePosted = indvNormal[i].join('');
     }
-      setMasterBoard(temp);
+      props.setMasterBoard(temp);
 }
 
-const TimePosted = ({props}) => {
+export const TimePosted = ({props}) => {
         var d = new Date(),
             month = '' + (d.getMonth() + 1),
             day = '' + d.getDate(),
