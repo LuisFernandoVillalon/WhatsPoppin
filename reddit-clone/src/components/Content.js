@@ -11,6 +11,9 @@ const Content = () => {
     const [masterBoard, setMasterBoard] = useState([]);
     const [currentPost, setCurrentPost] = useState([]);
     const [searchInput, setSearchInput] = useState("");
+    const [searchResult, setSearchResult] = useState([]);
+    const [logIn, setLogIn] = useState(false);
+    const [signUp, setSignUp] = useState(false);
 
 
     useEffect(() => {
@@ -25,6 +28,13 @@ const Content = () => {
                     searchInput={searchInput}
                     setSearchInput={setSearchInput}
                     masterBoard={masterBoard}
+                    searchResult={searchResult}
+                    setSearchResult={setSearchResult}
+                    setCurrentPost={setCurrentPost}
+                    logIn={logIn}
+                    setLogIn={setLogIn}
+                    signUp={signUp}
+                    setSignUp={setSignUp}
                 />
                 <Routes >
                     <Route path="/" element={<HomeBoard 

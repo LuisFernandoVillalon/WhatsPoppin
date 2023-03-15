@@ -15,7 +15,7 @@ const HomeBoard = (props) => {
                 <div tabIndex="2" className="board-section" onClick={() => newBoard({props})}><Newspaper/>New</div>
                 <div tabIndex="3" className="board-section" onClick={() => oldBoard({props})}><Clock/>Old</div>
             </div>
-            <div>
+            <div className='hide-scroll'>
              <MessageBoard 
                 props={props}
                 key={uniqid()}

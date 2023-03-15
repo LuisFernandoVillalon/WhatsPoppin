@@ -5,7 +5,7 @@ import MessageBoard from "./pages/MessageBoard";
 
 function App() {
   return (
-    <div>
+    <>
       <MessageBoard />
       {/* <BrowserRouter path="/">
         <Routes>
@@ -13,7 +13,7 @@ function App() {
           <Route path="/post" element={<Post />}/>
         </Routes>
       </BrowserRouter> */}
-    </div>
+    </>
   );
 }
 
