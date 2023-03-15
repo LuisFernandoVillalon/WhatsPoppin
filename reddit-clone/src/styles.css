@@ -8,8 +8,6 @@ body {
 .logo-container {
     display: flex;
     align-items: center;
-}
-.logo-container:hover {
     cursor: pointer;
 }
 .header-container {
@@ -23,6 +21,12 @@ body {
 }
 .logo {
     width: 4rem;
+}
+.logo-form {
+    margin-top: -15%;
+    margin-left: -5%;
+    width: 5rem;
+    cursor: pointer;
 }
 .search-container {
     display: flex;
@@ -347,7 +351,8 @@ a {
     flex-direction: column;
     justify-content: center;
     align-items: flex-start;
-    gap: 25px;
+    gap: 15px;
+    
 }
 .input-form {
     font-size: 1.5rem;

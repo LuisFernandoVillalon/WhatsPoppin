@@ -104,12 +104,20 @@ function closeForm(props) {
     props.props.setSignUp(false);
     props.useScroll();
 }
-
+function switchToSignUpForm(props) {
+    props.props.setLogIn(false);
+    props.props.setSignUp(true);
+}
+function switchToLogInForm(props) {
+    props.props.setSignUp(false);
+    props.props.setLogIn(true);
+}
 const LogInForm = (props) => {
     props.blockScroll();
     return (
         <div className="black-coat">
             <div className="logIn-Form">
+            <img className="logo-form" src={logo} alt="logo" onClick={() => closeForm(props)} />
                 <div className="close-form" onClick={() => closeForm(props)}>< X /></div>
                 <h4>Log In</h4>
                 <div className="input-form-container">
@@ -117,7 +125,7 @@ const LogInForm = (props) => {
                     <input className="input-form" type="password" placeholder="Password" />
                     <button className="login-button-form">Log In</button>
                     <p className="small-text-form">Don't have an account? <p className="small-text-form-blue"
-                        onClick={() => {switchToSignUpForm()}}
+                        onClick={() => {switchToSignUpForm(props)}}
                     >SIGN UP</p></p>
                 </div>
             </div>
@@ -130,14 +138,17 @@ const SignUpForm = (props) => {
     return (
         <div className="black-coat">
             <div className="logIn-Form">
+            <img className="logo-form" src={logo} alt="logo" onClick={() => closeForm(props)} />
                 <div className="close-form" onClick={() => closeForm(props)}>< X /></div>
-                <h5>By creating an account, you will be able to post, as well as, vote and comment on all your favorite content.</h5>
+                <h5>Post, vote, and comment with the world.<br></br>Create an account today!</h5>
                 <div className="input-form-container">
                 <input className="input-form" type="email" placeholder="Username"/>
                     <input className="input-form" type="email" placeholder="Email"/>
                     <input className="input-form" type="password" placeholder="Password" />
                     <button className="login-button-form">Sign Up</button>
-                    <p className="small-text-form">Already have an account? <p className="small-text-form-blue">LOG IN</p></p>
+                    <p className="small-text-form">Already have an account? <p className="small-text-form-blue"
+                        onClick={() => {switchToLogInForm(props)}}
+                    >LOG IN</p></p>
                 </div>
             </div>
         </div>
