@@ -42,12 +42,18 @@ const Content = () => {
                         setMasterBoard={setMasterBoard}
                         currentPost={currentPost}
                         setCurrentPost={setCurrentPost}
+                        logIn={logIn}
+                        setLogIn={setLogIn}
+                        signUp={signUp}
+                        setSignUp={setSignUp}
                     />}/>
                     <Route path="/post" element={<Post 
                         masterBoard={masterBoard}
                         setMasterBoard={setMasterBoard}
                         currentPost={currentPost}
                         setCurrentPost={setCurrentPost}
+                        setLogIn={setLogIn}
+                        setSignUp={setSignUp}
                     />}/>
                 </Routes>
             </BrowserRouter> 

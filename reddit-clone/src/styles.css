@@ -115,6 +115,21 @@ a {
     display: grid;
     grid-template-columns: 0.05fr 1fr;
 }
+.individual-comment {
+    background-color: white;
+    margin-top: 2.5%;
+    margin-right: 5%;
+    padding: 3%;
+    display: grid;
+    grid-template-columns: 0.05fr 1fr;
+}
+.individual-response {
+    background-color: white;
+    margin-top: 2.5%;
+    margin-right: 5%;
+    margin-left: -15%;
+    padding: 3%;
+}
 .individual-post {
     background-color: white;
     margin-top: 2.5%;
@@ -145,28 +160,36 @@ a {
     border: thin solid black;
 }
 .first-column {
-    font-size: 1rem;
     display: flex;
     flex-direction: column;
     align-items: center;
     margin-left: -85%;
 }
+.first-column-comment {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-left: -85%;
+}
+.comment-line {
+    height: 30%;
+    width: 5%;
+    background-color: rgb(217, 223, 229);
+}
 .upArrow, .downArrow {
-    font-size: 1.25rem;
+    font-size: large;
 }
 .upArrow:hover {
     cursor: pointer;
     color: red;
     background-color: lightgray;
     border-radius: 5px;
-    padding: 5%;
 }
 .downArrow:hover {
     cursor: pointer;
     color: rgb(1, 120, 210);
     background-color: lightgray;
     border-radius: 5px;
-    padding: 5%;
 }
 .post-user {
     font-size: 0.75rem;
@@ -190,7 +213,18 @@ a {
     align-items: center;
     gap: 5px;
 }
-.post-comments:hover {
+.add-comment {
+    margin-left: -15%;
+    margin-top: 2.5%;
+    font-size: 0.75rem;
+    color:rgb(111, 111, 111);
+    padding: 2.5%;
+    margin-bottom: -5%;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+.post-comments:hover, .add-comment:hover {
     background-color: lightgray;
     border-radius: 5%;
     cursor: pointer;
@@ -214,6 +248,7 @@ a {
     justify-content: flex-start;
     align-items: flex-start;
     margin-left: 15%;
+    width: 100%;
 }
 .post-link {
     margin-top: 2.5%;
@@ -291,6 +326,9 @@ a {
     margin-top: 5%;
     margin-left: -15%;
 }
+.comment-text {
+    margin-left: -15%;
+}
 .search-options-container {
     display: flex;
     justify-content: center;
@@ -337,7 +375,6 @@ a {
     width: 100%;
     height: 100%;
     background-color: rgba(0, 0, 0, 0.5);
-    z-index: 1;
 
 }
 .close-form {
@@ -375,3 +412,51 @@ a {
     color: rgb(1, 120, 210);
     cursor: pointer;
 }
+.login-post-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    margin-left: -15%;
+    font-size: 0.75rem;
+    color: rgb(136, 136, 139);
+}
+.button-post-login {
+    background-color: red;
+    border-radius: 15px;
+    color: white;
+    border-color: red;
+    border-width: 5px;
+    font-size: 85%;
+    cursor: pointer;
+}
+.button-post-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 20%;
+}
+.sortby-comments-container {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    gap: 15px;
+    justify-content: flex-start;
+    color:rgb(136, 136, 139);
+}
+.sortby-comments-container > p {
+    font-size: 0.75rem;
+}
+.comment-section-container {
+    display: flex;
+    flex-direction: column;
+    margin-left: -15%;
+    width: 100%;
+}
+.sortby-comments {
+    color:rgb(136, 136, 139);
+    border-style: none;
+    font-size: 1rem;
+    cursor: pointer;
+}
+

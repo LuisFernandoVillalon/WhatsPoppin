@@ -18,7 +18,6 @@ const About = () => {
                     <li>JavaScript</li>
                     <li>React:
                         <ul>
-                            <li>Style-components</li>
                             <li>Router</li>
                             <li>Use-state</li>
                             <li>Use-Effect</li>

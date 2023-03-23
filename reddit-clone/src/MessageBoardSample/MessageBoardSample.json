@@ -6,7 +6,75 @@
         "voteAmount": 3,
         "title": "Is Ash really the best to ever was?",
         "content": "Let me know what you think.",
-        "comments": 0
+        "comments": [
+            {
+                "user": "yosemite-77",
+                "timePost": "2023-03-15",
+                "voteAmount": 9,
+                "text": "In my humble opinion he truly is.",
+                "comments": [""]
+            },
+            {
+                "user": "typo-sion-CAH",
+                "timePost": "2020-05-15",
+                "voteAmount": 11,
+                "text": "I think he will alwaysbe known as the best to ever was.",
+                "comments": [
+                    {
+                        "user": "pokeEnthus",
+                        "timePost": "2020-05-25",
+                        "voteAmount": 4,
+                        "text": "bika bika if u know what i mean, Am i right?",
+                        "comments": [
+                            {
+                                "user": "typo-sion-CAH",
+                                "timePost": "2021-05-09",
+                                "voteAmount": 2,
+                                "text": "big facts though",
+                                "comments": [
+                                    {
+                                        "user": "pokeEnthus",
+                                        "timePost": "2022-04-19",
+                                        "voteAmount": 1,
+                                        "text": "all fax, no printers",
+                                        "comments": [""]
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "user": "digi-Tamer",
+                        "timePost": "2020-05-25",
+                        "voteAmount": 1,
+                        "text": "im tearing up reading this :') ",
+                        "comments": [""]
+                    }
+                ]
+            },
+            {
+                "user": "MariahC.OO",
+                "timePost": "2022-11-13",
+                "voteAmount": -15,
+                "text": "Does anyone know where the restrooms are?.",
+                "comments": [
+                    {
+                        "user": "yosemite-77",
+                        "timePost": "2023-03-15",
+                        "voteAmount": 49,
+                        "text": "foh.",
+                        "comments": [""]
+                    },
+                    {
+                        "user": "imhere2LOL",
+                        "timePost": "2023-03-20",
+                        "voteAmount": 0,
+                        "text": "lol",
+                        "comments": [""]
+                    }
+                ]
+            }
+        ]
     }, 
     "1": {
         "user": "IluvChowder",
@@ -15,7 +83,7 @@
         "voteAmount": 0,
         "title": "Check this page out! The Odin Project",
         "content": "https://www.theodinproject.com/users/sign_in",
-        "comments": 0
+        "comments": [""]
     }, 
     "2": {
         "user": "solecae29",
@@ -24,7 +92,7 @@
         "voteAmount": 7,
         "title": "Cool game I found, it takes a while for the images to load lol",
         "content": "https://luisfernandovillalon.github.io/photo-tagging-top/",
-        "comments": 0
+        "comments": [""]
     },
     "3": {
         "user": "KoolKid-93",
@@ -33,7 +101,7 @@
         "voteAmount": 15,
         "title": "The Miracle of Life",
         "content": "https://external-preview.redd.it/tESIBoDibdi3kLUq8A8V1ay6WyzcSSlyp1luMGzVJu8.jpg?auto=webp&v=enabled&s=9870e2c93daadd5f2141cb661a7ec633b13a0d7b",
-        "comments": 0
+        "comments": [""]
     }, 
     "4": {
         "user": "foogetboutit",
@@ -42,7 +110,7 @@
         "voteAmount": 2,
         "title": "I found an organic reccipe for sandwiches,",
         "content": "I found it in my dreams, but I already forgot about it.",
-        "comments": 0
+        "comments": [""]
     }, 
     "5": {
         "user": "digi-Tamer",
@@ -51,6 +119,6 @@
         "voteAmount": 1,
         "title": "Controversional Opinion: I <3 DK",
         "content": "https://mario.wiki.gallery/images/8/84/MPS_Donkey_Kong_Artwork.png",
-        "comments": 0
+        "comments": [""]
     }
 }

@@ -1,13 +1,12 @@
-import { BarChartFill, Newspaper, Clock, ArrowUp, ArrowDown, ChatSquare, BoxArrowUpRight, Link45deg } from 'react-bootstrap-icons'; 
+import { BarChartFill, Newspaper, Clock, CaretUpFill, CaretDownFill, ChatSquare, BoxArrowUpRight, Link45deg } from 'react-bootstrap-icons'; 
+import useScrollBlock from "./useScrollBlock";
 
 import { useNavigate } from "react-router-dom";
 import uniqid from 'uniqid';
 
 const HomeBoard = (props) => {
-    // const [masterBoard, setMasterBoard] = useState([]);
-    // useEffect(() => {
-    //     getRecords({setMasterBoard});
-    // }, [])
+    const [blockScroll, useScroll] = useScrollBlock();
+
     return (
         <div>
             <div className="board-section-container">
@@ -18,6 +17,8 @@ const HomeBoard = (props) => {
             <div className='hide-scroll'>
              <MessageBoard 
                 props={props}
+                blockScroll={blockScroll}
+                useScroll={useScroll}
                 key={uniqid()}
              />
              </div>
@@ -29,8 +30,8 @@ const backTop = () => {
     window.scrollTo(0, 0);
 }
 
-const MessageBoard = ({props}) => {
-    let mB = props.masterBoard;
+const MessageBoard = (props) => {
+    let mB = props.props.masterBoard;
     const boardList = mB.map((currentPost) => (
         <IndividualPost 
             currentPost={currentPost}
@@ -59,62 +60,89 @@ const IndividualPost = (props) => {
     }
 }
 
-export const directLink = (props) => {
+const directLink = (props) => {
     window.open(props);
 }
 
+const signUp = ({props}) => {
+     props.props.setSignUp(true);
+}
+const antiCloseForm = (e) => {
+    e.stopPropagation();
+}
 const TextPost = ({props}) => {
+    let commentAmount = 0;
+    if (props.currentPost.comments[0] === "") {
+        commentAmount = 0;
+    } else {
+        commentAmount = props.currentPost.comments.length;
+    }
+    
     const navigate = useNavigate();
 
     const postRoute = (props) => {
-        props.props.setCurrentPost(props.currentPost);
-            navigate("/post");
+        let temp = props.props.props;
+        temp.setCurrentPost(props.currentPost);
+        navigate("/post");
     }
     return (
         <div className="individual-post"  onClick={() => postRoute(props)}>
-        <div className="first-column">
-             <ArrowUp className='upArrow'/>
+        <div className="first-column" onClick={antiCloseForm}>
+             <CaretUpFill className='upArrow' onClick={() => signUp(props)}/>
              {props.currentPost.voteAmount}
-             <ArrowDown className='downArrow'/>
+             <CaretDownFill className='downArrow' onClick={() => signUp(props)} />
         </div>
         <div className="second-column">
              <div className='post-user'>Posted by {props.currentPost.user}<TimePosted props={props}/></div>
              <div className='post-title'>{props.currentPost.title}</div>
-             <div className='post-comments'><ChatSquare /> {props.currentPost.comments} Comments</div>
+             <div className='post-comments'><ChatSquare /> {commentAmount} Comments</div>
         </div>
      </div>
     )
 }
 const ImagePost = ({props}) => {
+    let commentAmount = 0;
+    if (props.currentPost.comments[0] === "") {
+        commentAmount = 0;
+    } else {
+        commentAmount = props.currentPost.comments.length;
+    }
     const navigate = useNavigate();
 
     const postRoute = (props) => {
-        props.props.setCurrentPost(props.currentPost);
-            navigate("/post");
+        let temp = props.props.props;
+        temp.setCurrentPost(props.currentPost);
+        navigate("/post");
     }
     return (
         <div className="individual-post" onClick={() => postRoute(props)}>
         <div className="first-column">
-             <ArrowUp className='upArrow'/>
+             <CaretUpFill className='upArrow' onClick={() => signUp(props)}/>
              {props.currentPost.voteAmount}
-             <ArrowDown className='downArrow'/>
+             <CaretDownFill className='downArrow' onClick={() => signUp(props)}/>
         </div>
         <div className="second-column">
              <div className='post-user'>Posted by {props.currentPost.user}<TimePosted props={props} /></div>
              <div className='post-title'>{props.currentPost.title}</div>
              <img alt="post" src={props.currentPost.content} className="post-image"/>
-             <div className='post-comments'><ChatSquare/> {props.currentPost.comments} Comments</div>
+             <div className='post-comments'><ChatSquare/> {commentAmount} Comments</div>
         </div>
      </div>
     )
 }
 const LinkPost = ({props}) => {
-
+    let commentAmount = 0;
+    if (props.currentPost.comments[0] === "") {
+        commentAmount = 0;
+    } else {
+        commentAmount = props.currentPost.comments.length;
+    }
     const navigate = useNavigate();
 
     const postRoute = (props) => {
-        props.props.setCurrentPost(props.currentPost);
-            navigate("/post");
+        let temp = props.props.props;
+        temp.setCurrentPost(props.currentPost);
+        navigate("/post");
     }
 
      let temp = props.currentPost.title;
@@ -129,16 +157,16 @@ const LinkPost = ({props}) => {
     return (
         <div className="individual-post-link"  onClick={() => postRoute(props)}>
             <div className="first-column">
-                <ArrowUp className='upArrow'/>
+                <CaretUpFill className='upArrow' onClick={() => signUp(props)}/>
                 {props.currentPost.voteAmount}
-                <ArrowDown className='downArrow'/>
+                <CaretDownFill className='downArrow' onClick={() => signUp(props)}/>
             </div>
             
             <div className="second-column">
                     <div className='post-user'>Posted by {props.currentPost.user}<TimePosted props={props}/></div>
                     <div className='post-title-link'>{truncated}</div>
                     <a  rel="noreferrer" target="_blank" className='post-link' href={props.currentPost.content}>{props.currentPost.content}<BoxArrowUpRight/></a>
-                    <div className='post-comments'><ChatSquare /> {props.currentPost.comments} Comments</div>
+                    <div className='post-comments'><ChatSquare /> {commentAmount} Comments</div>
             </div>
 
             <div onClick={() => directLink(props.currentPost.content)} className='link-square'>
