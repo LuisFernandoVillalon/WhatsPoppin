@@ -1,14 +1,22 @@
-import { BarChartFill, Newspaper, Clock, CaretUpFill, CaretDownFill, ChatSquare, BoxArrowUpRight, Link45deg } from 'react-bootstrap-icons'; 
+import { BarChartFill, PencilSquare, Newspaper, Clock, CaretUpFill, CaretDownFill, ChatSquare, BoxArrowUpRight, Link45deg } from 'react-bootstrap-icons'; 
 import useScrollBlock from "./useScrollBlock";
-
 import { useNavigate } from "react-router-dom";
 import uniqid from 'uniqid';
 
 const HomeBoard = (props) => {
     const [blockScroll, useScroll] = useScrollBlock();
+    
+    const navigate = useNavigate();
+    const createPostRoute = () => {
+            navigate("/create-post");
+    }
 
     return (
         <div>
+            {props.logInState && <div className='create-post-container'>
+                                    <PencilSquare/>
+                                    <input onClick={createPostRoute} className='create-post-input' type="text" placeholder='Create Post'/>
+                                </div>}
             <div className="board-section-container">
                 <div tabIndex="1" className="board-section" onClick={() => topBoard({props})}><BarChartFill/>Top</div>
                 <div tabIndex="2" className="board-section" onClick={() => newBoard({props})}><Newspaper/>New</div>
@@ -32,6 +40,10 @@ const backTop = () => {
 
 const MessageBoard = (props) => {
     let mB = props.props.masterBoard;
+    if (!Array.isArray(mB)) {
+        mB = Object.values(mB);
+    }
+    //console.log(mB);
     const boardList = mB.map((currentPost) => (
         <IndividualPost 
             currentPost={currentPost}
@@ -50,7 +62,6 @@ const MessageBoard = (props) => {
 
 const IndividualPost = (props) => {
     const type = props.currentPost.type;
-
     if (type === "text") {
        return ( <TextPost props={props} key={uniqid()}/> )
     } else if (type === "image") {
@@ -146,13 +157,19 @@ const LinkPost = ({props}) => {
     }
 
      let temp = props.currentPost.title;
+     let tempLink = props.currentPost.content;
       let tempArr = temp.split('');
+      let tempArrLink = tempLink.split('');
      let truncated = [];
+     let truncatedLink = [];
      for (let i = 0; i <= 40; ++i) {
          truncated.push(tempArr[i]);
+         truncatedLink.push(tempArrLink[i]);
      }
      truncated.push("...");
      truncated.toString('');
+     truncatedLink.push("...");
+     truncatedLink.toString('');
     
     return (
         <div className="individual-post-link"  onClick={() => postRoute(props)}>
@@ -165,7 +182,7 @@ const LinkPost = ({props}) => {
             <div className="second-column">
                     <div className='post-user'>Posted by {props.currentPost.user}<TimePosted props={props}/></div>
                     <div className='post-title-link'>{truncated}</div>
-                    <a  rel="noreferrer" target="_blank" className='post-link' href={props.currentPost.content}>{props.currentPost.content}<BoxArrowUpRight/></a>
+                    <a  rel="noreferrer" target="_blank" className='post-link' href={props.currentPost.content}>{truncatedLink}<BoxArrowUpRight/></a>
                     <div className='post-comments'><ChatSquare /> {commentAmount} Comments</div>
             </div>
 
@@ -185,16 +202,24 @@ const LinkPost = ({props}) => {
 }
 
 const topBoard = ({props}) => {
-    let temp = [...props.masterBoard];
+    let firstTemp = props.masterBoard;
+    if (!Array.isArray(firstTemp)) {
+        firstTemp = Object.values(firstTemp);
+    }
+    let temp = [...firstTemp];
     temp.sort((a, b) => {
         return b.voteAmount - a.voteAmount;
     });
     props.setMasterBoard(temp);
 }
 const newBoard = ({props}) => {
-    let temp = [...props.masterBoard];
-    for (let i = 0; i < props.masterBoard.length; ++i) {
-        props.masterBoard[i].timePosted = props.masterBoard[i].timePosted.split('-').join('');
+    let firstTemp = props.masterBoard;
+    if (!Array.isArray(firstTemp)) {
+        firstTemp = Object.values(firstTemp);
+    }
+    let temp = [...firstTemp];
+    for (let i = 0; i < firstTemp.length; ++i) {
+        firstTemp[i].timePosted = firstTemp[i].timePosted.split('-').join('');
     }
     temp.sort((a, b) => {
         return b.timePosted - a.timePosted;
@@ -220,9 +245,13 @@ const newBoard = ({props}) => {
       props.setMasterBoard(temp);
 }
 const oldBoard = ({props}) => {
-    let temp = [...props.masterBoard];
-    for (let i = 0; i < props.masterBoard.length; ++i) {
-        props.masterBoard[i].timePosted = props.masterBoard[i].timePosted.split('-').join('');
+    let firstTemp = props.masterBoard;
+    if (!Array.isArray(firstTemp)) {
+        firstTemp = Object.values(firstTemp);
+    }
+    let temp = [...firstTemp];
+    for (let i = 0; i < firstTemp.length; ++i) {
+        firstTemp[i].timePosted = firstTemp[i].timePosted.split('-').join('');
     }
     temp.sort((a, b) => {
         return a.timePosted - b.timePosted;

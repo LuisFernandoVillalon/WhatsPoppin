@@ -80,6 +80,114 @@ body {
     font-size: 0.75rem;
     font-weight: bold;
 }
+.profile-container {
+    display: flex;
+    justify-content: center;
+    padding-top: 0.5%;
+    margin-right: 2.5%;
+    font-size: 2.5rem;
+
+    color: rgb(111, 111, 111);
+    cursor: pointer;
+}
+.account-menu-container {
+    position:absolute;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: flex-start;
+    top: 2%;
+    right: 15%;
+    background-color: white;
+    width: 150px;
+    font-size: 1rem;
+    box-shadow:  rgba(0, 0, 0, 0.25) 0px 0px 5px 5px;
+    border-radius: 5px;
+}
+.create-post-title {
+    color: red;
+    border-bottom: 2.5px solid black;
+    margin-right: 5%;
+    padding-bottom: 1%;
+}
+.create-post-container {
+    background-color: white;
+    margin-right: 5%;
+    margin-top: 3%;
+    padding: 2.5%;
+    color: rgb(111, 111, 111);
+    font-size: 2rem;
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    gap: 15px;
+}
+.create-post-input {
+    width: 100%;
+    font-size: 1.5rem;
+    border-style: none;
+}
+.types-of-post-buttons-container {
+    display: flex;
+    align-items: center;
+    justify-content: space-evenly;
+    background-color: white;
+    color: rgb(111, 111, 111);
+}
+.types-of-post-container {
+    background-color: white;
+    margin-right: 5%;
+}
+.input-title-post {
+    margin: 1.5%;
+    width: 95%;
+    font-size: 1rem;
+    border-style: none;
+    padding: 1.5%;
+}
+.input-text-post {
+    margin: 1.5%;
+    width: 95%;
+    font-size: 1rem;
+    border-style: none;
+    padding: 1.5%;
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+    height: 6rem;
+}
+.create-post-buttons-container {
+    display: flex;
+    justify-content: flex-end;
+    padding: 2.5%;
+    gap: 25px;
+}
+.type-of-post-button {
+    padding-top: 3%;
+    padding-bottom: 3%;
+    display: flex;
+    gap: 5px;
+    justify-content: center;
+    align-content: center;
+    font-size: 1.25rem;
+    cursor: pointer;
+    width: 100%;;
+}
+.type-of-post-button:focus {
+    color:rgb(1, 120, 210);
+    border-bottom: 2.5px solid rgb(1, 120, 210);
+}
+.menu-item {
+    padding: 5%;
+    width: 100%;
+    display: flex;
+    gap: 8px;
+}
+.menu-item:hover {
+    border-radius: 5px;
+    background-color: rgb(1, 120, 210);
+    color: white;
+    width: 135px;
+}
+menu
 a {
     text-decoration: none;
 }
@@ -91,9 +199,9 @@ a {
     display: flex;
     align-items: center;
     justify-content: space-evenly;
-    margin-top: 5%;
+    margin-top: 2.5%;
     margin-right: 5%;
-    padding: 1.5%;
+    padding: 2.5%;
 }
 .board-section {
     display: flex;;
@@ -172,20 +280,23 @@ a {
     margin-left: -85%;
 }
 .comment-line {
-    height: 30%;
+    height: 100%;
     width: 5%;
     background-color: rgb(217, 223, 229);
+}
+.nestedUpArrow, .nestedDownArrow {
+    font-size: 35px;
 }
 .upArrow, .downArrow {
     font-size: large;
 }
-.upArrow:hover {
+.upArrow:hover, .nestedUpArrow:hover {
     cursor: pointer;
     color: red;
     background-color: lightgray;
     border-radius: 5px;
 }
-.downArrow:hover {
+.downArrow:hover, .nestedDownArrow:hover {
     cursor: pointer;
     color: rgb(1, 120, 210);
     background-color: lightgray;
@@ -306,7 +417,7 @@ a {
     align-items: center;
     height: 4%;
 }
-.backtop-button {
+.backtop-button, .create-post-button {
     background-color: rgb(1, 120, 210);
     border-color: white;
     border-width: 5px; 

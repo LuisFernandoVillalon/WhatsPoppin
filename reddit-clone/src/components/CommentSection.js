@@ -57,9 +57,9 @@ const DisplayComments = ({response, setSignUp}) => {
     return (
         <div className="individual-comment" >
             <div className="first-column-comment">
-                <CaretUpFill className='upArrow' onClick={() => signUp({setSignUp})}/>
+                <CaretUpFill className='nestedUpArrow' onClick={() => signUp({setSignUp})}/>
                 {response.voteAmount}
-                <CaretDownFill className='downArrow' onClick={() => signUp({setSignUp})}/>
+                <CaretDownFill className='nestedDownArrow' onClick={() => signUp({setSignUp})}/>
                 <div className="comment-line"></div>
             </div>
             <div className="second-column-page">

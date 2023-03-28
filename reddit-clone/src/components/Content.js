@@ -6,6 +6,7 @@ import { useState, useEffect } from "react";
 import Post from './Post';
 import "../styles.css";
 import Header from "./Header";
+import CreatePost from "./CreatePost";
 
 const Content = () => {
     const [masterBoard, setMasterBoard] = useState([]);
@@ -14,11 +15,21 @@ const Content = () => {
     const [searchResult, setSearchResult] = useState([]);
     const [logIn, setLogIn] = useState(false);
     const [signUp, setSignUp] = useState(false);
+    const [displayUserName, setDisplayUserName] = useState(localStorage.getItem("currentUser"));
+    let temp = "";
+    if (localStorage.getItem("loginStatus") == "false") {
+        temp = false;
+    } else {
+        temp = true;
+    }
+    const [logInState, setLogInState] = useState(temp);
 
 
     useEffect(() => {
         getRecords({ setMasterBoard});
     }, []);
+
+
     return (
 
         <div className="content-container">
@@ -35,6 +46,10 @@ const Content = () => {
                     setLogIn={setLogIn}
                     signUp={signUp}
                     setSignUp={setSignUp}
+                    logInState={logInState}
+                    setLogInState={setLogInState}
+                    displayUserName={displayUserName}
+                    setDisplayUserName={setDisplayUserName}
                 />
                 <Routes >
                     <Route path="/" element={<HomeBoard 
@@ -46,6 +61,8 @@ const Content = () => {
                         setLogIn={setLogIn}
                         signUp={signUp}
                         setSignUp={setSignUp}
+                        logInState={logInState}
+                        setLogInState={setLogInState}
                     />}/>
                     <Route path="/post" element={<Post 
                         masterBoard={masterBoard}
@@ -55,21 +72,12 @@ const Content = () => {
                         setLogIn={setLogIn}
                         setSignUp={setSignUp}
                     />}/>
+                    <Route path="/create-post" element={<CreatePost />}/>
                 </Routes>
             </BrowserRouter> 
             <About />
       </div>
 
-
-
-        // <div className="content-container">
-        //     <div>
-        //         <HomeBoard /> 
-        //     </div>
-        //     <div>
-        //         <About />
-        //     </div>
-        // </div>
     )
 }
 
