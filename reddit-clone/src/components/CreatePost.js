@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { React, useState, useRef } from "react";
 import { addPostToDataBase } from '../MessageBoardSample/firebaseData';
 
-const CreatePost = () => {
+const CreatePost = (props) => {
 
     const [textInput, setTextInput] = useState(true);
     const [imageInput, setImageInput] = useState(false);
@@ -34,7 +34,6 @@ const CreatePost = () => {
         setImageInput(false);
         setLinkInput(true);
     }
-
     const handleSubmit = (event) => {
         event.preventDefault();
         const user = localStorage.getItem("currentUser");
@@ -55,8 +54,8 @@ const CreatePost = () => {
         const title = titleRef.current.value;
         const content = textRef.current.value;
         const comments = [""];
-        console.log([user, type, timePosted, voteAmount, title, content, comments])
-        addPostToDataBase(user, type, timePosted, voteAmount, title, content, comments);
+        
+        addPostToDataBase(user, type, timePosted, voteAmount, title, content, comments, props);
         navigate("/");
     }
 

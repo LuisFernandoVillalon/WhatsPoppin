@@ -33,7 +33,6 @@ const CommentSection = ({currentPost, masterBoard, setCurrentPost, setLogIn, set
     )
 }
 const signUp = ({setSignUp}) => {
-    
     setSignUp(true);
 }
 const DisplayComments = ({response, setSignUp}) => {

@@ -1,6 +1,8 @@
 import { CaretUpFill, CaretDownFill, ChatSquare, BoxArrowUpRight } from 'react-bootstrap-icons'; 
 import  CommentSection  from "./CommentSection";
 import uniqid from 'uniqid';
+import { useState, useEffect } from "react";
+import { upVoteIndividualPostFirebase, downVoteIndividualPostFirebase } from '../MessageBoardSample/firebaseData';
 
 const Post = ({masterBoard,
     setMasterBoard,
@@ -9,7 +11,12 @@ const Post = ({masterBoard,
     logIn,
     setLogIn,
     signUp,
-    setSignUp
+    setSignUp,
+    logInState,
+    currentUserUID,
+    entryMB,
+    upVoteList,
+    downVoteList
 }) => {
     let type = currentPost.type;
     
@@ -23,6 +30,11 @@ const Post = ({masterBoard,
                         setLogIn={setLogIn}
                         signUp={signUp}
                         setSignUp={setSignUp} 
+                        logInState={logInState}
+                        currentUserUID={currentUserUID}
+                        entryMB={entryMB}
+                        upVoteList={upVoteList}
+                        downVoteList={downVoteList}
                         key={uniqid()}
                 /> )
       }  else if (type === "image") {
@@ -35,6 +47,11 @@ const Post = ({masterBoard,
                         setLogIn={setLogIn}
                         signUp={signUp}
                         setSignUp={setSignUp} 
+                        logInState={logInState}
+                        currentUserUID={currentUserUID}
+                        entryMB={entryMB}
+                        upVoteList={upVoteList}
+                        downVoteList={downVoteList}
                         key={uniqid()}
                 /> )
       } else if (type === "link") {
@@ -47,27 +64,43 @@ const Post = ({masterBoard,
                         setLogIn={setLogIn}
                         signUp={signUp}
                         setSignUp={setSignUp} 
+                        logInState={logInState}
+                        currentUserUID={currentUserUID}
+                        entryMB={entryMB}
+                        upVoteList={upVoteList}
+                        downVoteList={downVoteList}
                         key={uniqid()}
                 /> )
      }
 }
-
 const displaySignUp = ({setSignUp}) => {
     setSignUp(true);
 }
 const displayLogIn = ({setLogIn}) => {
     setLogIn(true);
 }
-
-
-const TextPostPage = ({masterBoard,
+const upVotePost = (postVoteAmount, currentPost, currentUserUID, entryMB) => {
+    const props = {currentPost, currentUserUID, entryMB};
+    upVoteIndividualPostFirebase(postVoteAmount + 1, props);
+}
+const downVotePost = (postVoteAmount, currentPost, currentUserUID, entryMB) => {
+    const props = {currentPost, currentUserUID, entryMB};
+    downVoteIndividualPostFirebase(postVoteAmount - 1, props);
+}
+const TextPostPage = ({
+    masterBoard,
     setMasterBoard,
     currentPost,
     setCurrentPost,
     logIn,
     setLogIn,
     signUp,
-    setSignUp
+    setSignUp,
+    logInState,
+    currentUserUID,
+    entryMB,
+    upVoteList,
+    downVoteList
 }) => {
    
     let commentAmount = 0;
@@ -76,13 +109,69 @@ const TextPostPage = ({masterBoard,
     } else {
         commentAmount = currentPost.comments.length;
     }
+
+    const [postVoteAmount, setPostVoteAmount] = useState(0);
+    const [downVoteStatus, setDownVoteStatus] = useState(false);
+    const [upVoteStatus, setUpVoteStatus] = useState(false);
+    useEffect(() => {
+        const tempMB = Object.entries(masterBoard);
+        tempMB.map((currentPostID) => {
+            if (currentPostID[0] === currentPost.newUserKey) {
+                setPostVoteAmount(currentPostID[1].voteAmount)
+            }
+        })
+        let upVoteListArray = Object.entries(upVoteList);
+        upVoteListArray.map((user) => {
+            let tempUID = "";
+            if (typeof currentUserUID !== "string") {
+                tempUID = currentUserUID.uid;
+            }
+            if (user[0] === currentUserUID || user[0] === tempUID) {
+                let userArray = Object.entries(user[1]);
+                userArray.map((likedPost) => {
+                    if (currentPost.newUserKey === likedPost[0]) {
+                        if (likedPost[1].upVoteState === true) {
+                            setUpVoteStatus(true);
+                        }
+                    }
+                    
+                })
+            }
+        });
+        let downVoteListArray = Object.entries(downVoteList);
+        downVoteListArray.map((user) => {
+            let tempUID = "";
+            if (typeof currentUserUID !== "string") {
+                tempUID = currentUserUID.uid;
+            }
+            if (user[0] === currentUserUID || user[0] === tempUID) {
+                let userArray = Object.entries(user[1]);
+                userArray.map((unLikedPost) => {
+                    if (currentPost.newUserKey === unLikedPost[0]) {
+                        if (unLikedPost[1].downVoteState === true) {
+                            setDownVoteStatus(true);
+                        }
+                    }
+                    
+                })
+            }
+        });
+    }, [currentPost.voteAmount]);
+
     return (
         <div className="individual-post-page" >
-        <div className="first-column">
-             <CaretUpFill className='upArrow' onClick={() => displaySignUp({setSignUp})}/>
-             {currentPost.voteAmount}
-             <CaretDownFill className='downArrow' onClick={() => displaySignUp({setSignUp})}/>
-        </div>
+        {!logInState && <div className="first-column">
+                            <CaretUpFill className='upArrow' onClick={() => displaySignUp({setSignUp})}/>
+                                {postVoteAmount}
+                            <CaretDownFill className='downArrow' onClick={() => displaySignUp({setSignUp})}/>
+                        </div>
+        }
+        {logInState && <div className="first-column">
+                            {upVoteStatus ? <CaretUpFill className='upArrowActive'/> : <CaretUpFill  onClick={() => upVotePost(postVoteAmount, currentPost, currentUserUID, entryMB)} className='upArrow'/>}                                                                                                        
+                                {postVoteAmount}
+                            {downVoteStatus ? <CaretDownFill className='downArrowActive'/> : <CaretDownFill onClick={() => downVotePost(postVoteAmount, currentPost, currentUserUID, entryMB)} className='downArrow'/>}                                                                                                             
+                        </div>
+        }
         <div className="second-column-page">
              <div className='post-user'>Posted by {currentPost.user}<TimeCommentPosted 
                                                                         currentPost={currentPost}
@@ -92,13 +181,24 @@ const TextPostPage = ({masterBoard,
              <div className='post-title'>{currentPost.title}</div>
              <div className="post-text">{currentPost.content}</div>
              <div className='post-comments'><ChatSquare /> {commentAmount} Comments</div>
-             <div className='login-post-container'>
-                <p>Log in or sign up to leave a comment</p>
-                <div className='button-post-container'>
-                    <button className='button-post-login' onClick={() => displayLogIn({setLogIn})}>LOG IN</button>
-                    <button className='button-post-login' onClick={() => displaySignUp({setSignUp})}>SIGN UP</button>
-                </div>
-             </div>
+            {!logInState && <div className='login-post-container'>
+                                <p>Log in or sign up to leave a comment</p>
+                                <div className='button-post-container'>
+                                    <button className='button-post-login' onClick={() => displayLogIn({setLogIn})}>LOG IN</button>
+                                    <button className='button-post-login' onClick={() => displaySignUp({setSignUp})}>SIGN UP</button>
+                                </div>
+                            </div>
+            }
+            {logInState && <div className='post-comment-container'>
+                                <p className='comment-label'>Comment as {localStorage.getItem("currentUser")}</p>
+                                <div className='post-comment-input-container'>
+                                    <textarea className='post-comment-input' placeholder='What are your thoughts?'></textarea>
+                                    <div className='post-comment-button-container'>
+                                        <button className='post-comment-button'>COMMENT</button>
+                                    </div>
+                                </div>
+                           </div>
+            }
              <CommentSection 
                 masterBoard={masterBoard}
                 setMasterBoard={setMasterBoard}
@@ -115,15 +215,20 @@ const TextPostPage = ({masterBoard,
      </div>
     )
 }
-
-const ImagePostPage = ({masterBoard,
+const ImagePostPage = ({
+    masterBoard,
     setMasterBoard,
     currentPost,
     setCurrentPost,
     logIn,
     setLogIn,
     signUp,
-    setSignUp
+    setSignUp,
+    logInState,
+    currentUserUID,
+    entryMB,
+    upVoteList,
+    downVoteList
 }) => {
     let commentAmount = 0;
     if (currentPost.comments[0] === "") {
@@ -131,25 +236,92 @@ const ImagePostPage = ({masterBoard,
     } else {
         commentAmount = currentPost.comments.length;
     }
+
+    const [postVoteAmount, setPostVoteAmount] = useState(0);
+    const [downVoteStatus, setDownVoteStatus] = useState(false);
+    const [upVoteStatus, setUpVoteStatus] = useState(false);
+    useEffect(() => {
+        const tempMB = Object.entries(masterBoard);
+        tempMB.map((currentPostID) => {
+            if (currentPostID[0] === currentPost.newUserKey) {
+                setPostVoteAmount(currentPostID[1].voteAmount)
+            }
+        })
+        let upVoteListArray = Object.entries(upVoteList);
+        upVoteListArray.map((user) => {
+            let tempUID = "";
+            if (typeof currentUserUID !== "string") {
+                tempUID = currentUserUID.uid;
+            }
+            if (user[0] === currentUserUID || user[0] === tempUID) {
+                let userArray = Object.entries(user[1]);
+                userArray.map((likedPost) => {
+                    if (currentPost.newUserKey === likedPost[0]) {
+                        if (likedPost[1].upVoteState === true) {
+                            setUpVoteStatus(true);
+                        }
+                    }
+                    
+                })
+            }
+        });
+        let downVoteListArray = Object.entries(downVoteList);
+        downVoteListArray.map((user) => {
+            let tempUID = "";
+            if (typeof currentUserUID !== "string") {
+                tempUID = currentUserUID.uid;
+            }
+            if (user[0] === currentUserUID || user[0] === tempUID) {
+                let userArray = Object.entries(user[1]);
+                userArray.map((unLikedPost) => {
+                    if (currentPost.newUserKey === unLikedPost[0]) {
+                        if (unLikedPost[1].downVoteState === true) {
+                            setDownVoteStatus(true);
+                        }
+                    }
+                    
+                })
+            }
+        });
+    }, [currentPost.voteAmount]);
+
     return (
         <div className="individual-post-page">
-            <div className="first-column" >
-                <CaretUpFill className='upArrow' onClick={() => displaySignUp({setSignUp})}/>
-                {currentPost.voteAmount}
-                <CaretDownFill className='downArrow' onClick={() => displaySignUp({setSignUp})}/>
-            </div>
+        {!logInState && <div className="first-column">
+                            <CaretUpFill className='upArrow' onClick={() => displaySignUp({setSignUp})}/>
+                                {postVoteAmount}
+                            <CaretDownFill className='downArrow' onClick={() => displaySignUp({setSignUp})}/>
+                        </div>
+        }
+        {logInState && <div className="first-column">
+                            {upVoteStatus ? <CaretUpFill className='upArrowActive'/> : <CaretUpFill  onClick={() => upVotePost(postVoteAmount, currentPost, currentUserUID, entryMB)} className='upArrow'/>}                                                                                                        
+                                {postVoteAmount}
+                            {downVoteStatus ? <CaretDownFill className='downArrowActive'/> : <CaretDownFill onClick={() => downVotePost(postVoteAmount, currentPost, currentUserUID, entryMB)} className='downArrow'/>}                                                                                                             
+                        </div>
+        }
             <div className="second-column-page">
                 <div className='post-user'>Posted by {currentPost.user}<TimeCommentPosted currentPost={currentPost} key={uniqid()}/></div>
                 <div className='post-title'>{currentPost.title}</div>
                 <img alt="post" src={currentPost.content} className="post-image"/>
                 <div className='post-comments'><ChatSquare key={uniqid()} /> {commentAmount} Comments</div>
-                <div className='login-post-container'>
-                    <p>Log in or sign up to leave a comment</p>
-                    <div className='button-post-container'>
-                        <button className='button-post-login' onClick={() => displayLogIn({setLogIn})}>LOG IN</button>
-                        <button className='button-post-login' onClick={() => displaySignUp({setSignUp})}>SIGN UP</button>
-                    </div>
-                </div>
+                {!logInState && <div className='login-post-container'>
+                                <p>Log in or sign up to leave a comment</p>
+                                <div className='button-post-container'>
+                                    <button className='button-post-login' onClick={() => displayLogIn({setLogIn})}>LOG IN</button>
+                                    <button className='button-post-login' onClick={() => displaySignUp({setSignUp})}>SIGN UP</button>
+                                </div>
+                            </div>
+                }
+                {logInState && <div className='post-comment-container'>
+                                <p className='comment-label'>Comment as {localStorage.getItem("currentUser")}</p>
+                                <div className='post-comment-input-container'>
+                                    <textarea className='post-comment-input' placeholder='What are your thoughts?'></textarea>
+                                    <div className='post-comment-button-container'>
+                                        <button className='post-comment-button'>COMMENT</button>
+                                    </div>
+                                </div>
+                           </div>
+                }
                 <CommentSection 
                     masterBoard={masterBoard}
                     setMasterBoard={setMasterBoard}
@@ -165,15 +337,20 @@ const ImagePostPage = ({masterBoard,
      </div>
     )
 }
-
-const LinkPostPage = ({masterBoard,
+const LinkPostPage = ({
+    masterBoard,
     setMasterBoard,
     currentPost,
     setCurrentPost,
     logIn,
     setLogIn,
     signUp,
-    setSignUp
+    setSignUp,
+    logInState,
+    currentUserUID,
+    entryMB,
+    upVoteList,
+    downVoteList
 }) => {
     let commentAmount = 0;
     if (currentPost.comments[0] === "") {
@@ -189,27 +366,93 @@ const LinkPostPage = ({masterBoard,
     }
     truncated.push("...");
     truncated.toString('');
+
+    const [postVoteAmount, setPostVoteAmount] = useState(0);
+    const [downVoteStatus, setDownVoteStatus] = useState(false);
+    const [upVoteStatus, setUpVoteStatus] = useState(false);
+    useEffect(() => {
+        const tempMB = Object.entries(masterBoard);
+        tempMB.map((currentPostID) => {
+            if (currentPostID[0] === currentPost.newUserKey) {
+                setPostVoteAmount(currentPostID[1].voteAmount)
+            }
+        })
+        let upVoteListArray = Object.entries(upVoteList);
+        upVoteListArray.map((user) => {
+            let tempUID = "";
+            if (typeof currentUserUID !== "string") {
+                tempUID = currentUserUID.uid;
+            }
+            if (user[0] === currentUserUID || user[0] === tempUID) {
+                let userArray = Object.entries(user[1]);
+                userArray.map((likedPost) => {
+                    if (currentPost.newUserKey === likedPost[0]) {
+                        if (likedPost[1].upVoteState === true) {
+                            setUpVoteStatus(true);
+                        }
+                    }
+                    
+                })
+            }
+        });
+        let downVoteListArray = Object.entries(downVoteList);
+        downVoteListArray.map((user) => {
+            let tempUID = "";
+            if (typeof currentUserUID !== "string") {
+                tempUID = currentUserUID.uid;
+            }
+            if (user[0] === currentUserUID || user[0] === tempUID) {
+                let userArray = Object.entries(user[1]);
+                userArray.map((unLikedPost) => {
+                    if (currentPost.newUserKey === unLikedPost[0]) {
+                        if (unLikedPost[1].downVoteState === true) {
+                            setDownVoteStatus(true);
+                        }
+                    }
+                    
+                })
+            }
+        });
+    }, [currentPost.voteAmount]);
    
    return (
        <div className="individual-post-link-page">
-           <div className="first-column">
-               <CaretUpFill className='upArrow' onClick={() => displaySignUp({setSignUp})}/>
-               {currentPost.voteAmount}
-               <CaretDownFill className='downArrow' onClick={() => displaySignUp({setSignUp})}/>
-           </div>
+        {!logInState && <div className="first-column">
+                            <CaretUpFill className='upArrow' onClick={() => displaySignUp({setSignUp})}/>
+                                {postVoteAmount}
+                            <CaretDownFill className='downArrow' onClick={() => displaySignUp({setSignUp})}/>
+                        </div>
+        }
+        {logInState && <div className="first-column">
+                            {upVoteStatus ? <CaretUpFill className='upArrowActive'/> : <CaretUpFill  onClick={() => upVotePost(postVoteAmount, currentPost, currentUserUID, entryMB)} className='upArrow'/>}                                                                                                        
+                                {postVoteAmount}
+                            {downVoteStatus ? <CaretDownFill className='downArrowActive'/> : <CaretDownFill onClick={() => downVotePost(postVoteAmount, currentPost, currentUserUID, entryMB)} className='downArrow'/>}                                                                                                             
+                        </div>
+        }
            
            <div className="second-column-page">
                    <div className='post-user'>Posted by {currentPost.user}<TimeCommentPosted currentPost={currentPost} key={uniqid()}/></div>
                    <div className='post-title-link'>{currentPost.title}</div>
                    <a  rel="noreferrer" target="_blank" className='post-link-page' href={currentPost.content}>{currentPost.content}<BoxArrowUpRight/></a>
                    <div className='post-comments'><ChatSquare /> {commentAmount} Comments</div>
-                   <div className='login-post-container'>
-                        <p>Log in or sign up to leave a comment</p>
-                        <div className='button-post-container'>
-                            <button className='button-post-login' onClick={() => displayLogIn({setLogIn})}>LOG IN</button>
-                            <button className='button-post-login' onClick={() => displaySignUp({setSignUp})}>SIGN UP</button>
-                        </div>
-                    </div>   
+                   {!logInState && <div className='login-post-container'>
+                                <p>Log in or sign up to leave a comment</p>
+                                <div className='button-post-container'>
+                                    <button className='button-post-login' onClick={() => displayLogIn({setLogIn})}>LOG IN</button>
+                                    <button className='button-post-login' onClick={() => displaySignUp({setSignUp})}>SIGN UP</button>
+                                </div>
+                            </div>
+                    }
+                    {logInState && <div className='post-comment-container'>
+                                <p className='comment-label'>Comment as {localStorage.getItem("currentUser")}</p>
+                                <div className='post-comment-input-container'>
+                                    <textarea className='post-comment-input' placeholder='What are your thoughts?'></textarea>
+                                    <div className='post-comment-button-container'>
+                                        <button className='post-comment-button'>COMMENT</button>
+                                    </div>
+                                </div>
+                           </div>
+                    } 
                     <CommentSection 
                         masterBoard={masterBoard}
                         setMasterBoard={setMasterBoard}
@@ -226,7 +469,6 @@ const LinkPostPage = ({masterBoard,
 
    )
 }
-
 const TimeCommentPosted = ({currentPost}) => {
     var d = new Date(),
         month = '' + (d.getMonth() + 1),
@@ -346,5 +588,4 @@ return (
     <> {timePosted}</>
 )
 }
-
 export default Post;

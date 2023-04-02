@@ -27,14 +27,40 @@ const Header = (props) => {
        if (e.target.value === "") {
         return props.setSearchResult([]);
        }
+       let temp = props.masterBoard;
+       if (!Array.isArray(temp)) {
+            temp = Object.entries(temp).filter((data) => {
+                if (data[0] !== "downVoteList" && data[0] !== "upVoteList") {
+                    return data;
+                }
+            })
+            const ans = temp.filter((post) => {
+                let a = post[1].title.toLowerCase();
+                let b = props.searchInput.toLowerCase();
+                return a.match(b);
+            });           
+            props.setSearchResult(ans);
+        } else {
+                temp = temp.filter((data) => {
+                        if (data.title !== undefined) {
+                            return data;
+                        }
+                })
+                const ans = temp.filter((post) => {
+                    console.log(post);
+                    let a = post.title.toLowerCase();
+                    let b = props.searchInput.toLowerCase();
+                    return a.match(b);
+                });           
+                props.setSearchResult(ans);
+        }
+        // const ans = temp.filter((post) => {
+        //     let a = post[1].title.toLowerCase();
+        //     let b = props.searchInput.toLowerCase();
+        //     return a.match(b);
+        // });
 
-        const ans = props.masterBoard.filter((post) => {
-            let a = post.title.toLowerCase();
-            let b = props.searchInput.toLowerCase();
-            return a.match(b);
-        });
-
-        props.setSearchResult(ans);
+        // props.setSearchResult(ans);
 
     };
     let temp = props.searchResult;
@@ -55,7 +81,7 @@ const Header = (props) => {
     const logOut = () => {
         localStorage.setItem("loginStatus", false);
         localStorage.setItem("displayUserName", "");
-
+        localStorage.setItem("currentUserUID", "");
         props.setDisplayUserName("");
         props.setLogInState(false);
     }
@@ -69,16 +95,14 @@ const Header = (props) => {
                 <div className="search-container">
                     <Search /> 
                     <input className="search-post" type="text" 
-                    placeholder="Search for a post" onChange={(e) => handleChange(e)} 
-
-                    ></input>
+                    placeholder="Search for a post" onChange={(e) => handleChange(e)}/>
                 </div>
                  <div className="place-under-bar">{options}</div> 
             </div>
-            {!props.logInState &&           <div className="login-container">
-                                                <button className="login-button" onClick={() => signUp(props)}>Sign up</button>
-                                                <button className="login-button" onClick={() => logIn(props)}>Log In</button>
-                                            </div>
+            {!props.logInState &&   <div className="login-container">
+                                        <button className="login-button" onClick={() => signUp(props)}>Sign up</button>
+                                        <button className="login-button" onClick={() => logIn(props)}>Log In</button>
+                                    </div>
             }
             {props.logInState && <div className="profile-container" onClick={() => openMenu()}>
                                     <PersonFill />
@@ -89,10 +113,6 @@ const Header = (props) => {
                                                           </div>
                                     }
                                 </div>}
-            {/* <div className="login-container">
-                <button className="login-button" onClick={() => signUp(props)}>Sign up</button>
-                <button className="login-button" onClick={() => logIn(props)}>Log In</button>
-            </div> */}
             {props.logIn && <LogInForm 
                 blockScroll={blockScroll} 
                 useScroll={useScroll}
@@ -109,15 +129,21 @@ const Header = (props) => {
 
 const BarOptions = (props) => {
     const navigate = useNavigate();
+    let tempDisplay = "";
+    if (Array.isArray(props.post)) {
+        tempDisplay = props.post[1];
+    } else {
+        tempDisplay = props.post;
+    }
 
     const postRoute = (props) => {
-        props.props.setCurrentPost(props.post);
+        props.props.setCurrentPost(tempDisplay);
         props.props.setSearchResult([])
             navigate("/post");
     }
     return (
         
-            <div className="search-options" onClick={() => postRoute(props)}>{props.post.title}</div>
+            <div className="search-options" onClick={() => postRoute(props)}>{tempDisplay.title}</div>
         
     )
 }

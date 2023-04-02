@@ -10,7 +10,7 @@ const SignUpForm = (props) => {
     const passwordRef = useRef(undefined);
     const confirmpasswordRef = useRef(undefined);
 
-    const handleSubmit = (event) => {
+    const handleSubmit = async (event) => {
         event.preventDefault();
 
         const username = usernameRef.current.value;
@@ -22,15 +22,16 @@ const SignUpForm = (props) => {
             window.alert("Password does not match.");
             return;
         } else {
-            addNewUser(email, password, username);
+            const user = await addNewUser(email, password, username);
 
             localStorage.setItem("loginStatus", true);
             localStorage.setItem("currentUser", username);
-
+            localStorage.setItem("currentUserUID", user.uid);
             props.props.setDisplayUserName(username);
             props.props.setLogInState(localStorage.getItem("loginStatus"));
             props.props.setLogIn(false);
             props.props.setSignUp(false);
+            props.props.setCurrentUserUID(user);
             props.useScroll();
             event.target.reset();
         }

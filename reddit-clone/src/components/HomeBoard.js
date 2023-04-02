@@ -1,7 +1,9 @@
-import { BarChartFill, PencilSquare, Newspaper, Clock, CaretUpFill, CaretDownFill, ChatSquare, BoxArrowUpRight, Link45deg } from 'react-bootstrap-icons'; 
+import { BarChartFill, PencilSquare, Newspaper, Clock, CaretUpFill, CaretDownFill, ChatSquare, BoxArrowUpRight, Link45deg, LayoutTextSidebar } from 'react-bootstrap-icons'; 
 import useScrollBlock from "./useScrollBlock";
 import { useNavigate } from "react-router-dom";
 import uniqid from 'uniqid';
+import { useState, useEffect, useRef } from "react";
+import { upVotePostFirebase, downVotePostFirebase } from '../MessageBoardSample/firebaseData';
 
 const HomeBoard = (props) => {
     const [blockScroll, useScroll] = useScrollBlock();
@@ -16,7 +18,8 @@ const HomeBoard = (props) => {
             {props.logInState && <div className='create-post-container'>
                                     <PencilSquare/>
                                     <input onClick={createPostRoute} className='create-post-input' type="text" placeholder='Create Post'/>
-                                </div>}
+                                </div>
+            }
             <div className="board-section-container">
                 <div tabIndex="1" className="board-section" onClick={() => topBoard({props})}><BarChartFill/>Top</div>
                 <div tabIndex="2" className="board-section" onClick={() => newBoard({props})}><Newspaper/>New</div>
@@ -40,14 +43,18 @@ const backTop = () => {
 
 const MessageBoard = (props) => {
     let mB = props.props.masterBoard;
+    if (mB === null) {
+        mB = [];
+    }
     if (!Array.isArray(mB)) {
         mB = Object.values(mB);
     }
-    //console.log(mB);
+
     const boardList = mB.map((currentPost) => (
         <IndividualPost 
             currentPost={currentPost}
             props={props}
+            key={uniqid()}
         />
 ))
     return (
@@ -57,8 +64,6 @@ const MessageBoard = (props) => {
         </>
     )
 }
-
-
 
 const IndividualPost = (props) => {
     const type = props.currentPost.type;
@@ -81,6 +86,13 @@ const signUp = ({props}) => {
 const antiCloseForm = (e) => {
     e.stopPropagation();
 }
+const upVotePost = (postVoteAmount, props) => {
+    upVotePostFirebase(postVoteAmount + 1, props)
+}
+const downVotePost = (postVoteAmount, props) => {
+    downVotePostFirebase(postVoteAmount - 1, props);
+}
+
 const TextPost = ({props}) => {
     let commentAmount = 0;
     if (props.currentPost.comments[0] === "") {
@@ -96,13 +108,66 @@ const TextPost = ({props}) => {
         temp.setCurrentPost(props.currentPost);
         navigate("/post");
     }
+    const ogProps = props.props.props;
+    const [postVoteAmount, setPostVoteAmount] = useState(0);
+    const [downVoteStatus, setDownVoteStatus] = useState(false);
+    const [upVoteStatus, setUpVoteStatus] = useState(false);
+
+
+    useEffect(() => {
+        setPostVoteAmount(props.currentPost.voteAmount);
+        let upVoteListArray = Object.entries(ogProps.upVoteList);
+        upVoteListArray.map((user) => {
+            let tempUID = "";
+            if (typeof ogProps.currentUserUID !== "string") {
+                tempUID = ogProps.currentUserUID.uid;
+            }
+            if (user[0] === ogProps.currentUserUID || user[0] === tempUID) {
+                let userArray = Object.entries(user[1]);
+                userArray.map((likedPost) => {
+                    if (props.currentPost.newUserKey === likedPost[0]) {
+                        if (likedPost[1].upVoteState === true) {
+                            setUpVoteStatus(true);
+                        }
+                    }
+                    
+                })
+            }
+        });
+        let downVoteListArray = Object.entries(ogProps.downVoteList);
+        downVoteListArray.map((user) => {
+            let tempUID = "";
+            if (typeof ogProps.currentUserUID !== "string") {
+                tempUID = ogProps.currentUserUID.uid;
+            }
+            if (user[0] === ogProps.currentUserUID || user[0] === tempUID) {
+                let userArray = Object.entries(user[1]);
+                userArray.map((unLikedPost) => {
+                    if (props.currentPost.newUserKey === unLikedPost[0]) {
+                        if (unLikedPost[1].downVoteState === true) {
+                            setDownVoteStatus(true);
+                        }
+                    }
+                    
+                })
+            }
+        });
+    }, [props.currentPost.voteAmount]);
+    
     return (
         <div className="individual-post"  onClick={() => postRoute(props)}>
-        <div className="first-column" onClick={antiCloseForm}>
-             <CaretUpFill className='upArrow' onClick={() => signUp(props)}/>
-             {props.currentPost.voteAmount}
-             <CaretDownFill className='downArrow' onClick={() => signUp(props)} />
-        </div>
+            {!ogProps.logInState && <div className="first-column" onClick={antiCloseForm}>
+                                        <CaretUpFill className='upArrow' onClick={() => signUp(props)}/>
+                                            {postVoteAmount}
+                                        <CaretDownFill className='downArrow' onClick={() => signUp(props)} />
+                                    </div> 
+            }
+            {ogProps.logInState && <div className="first-column" onClick={antiCloseForm}>
+                                        {upVoteStatus ? <CaretUpFill className='upArrowActive'/> : <CaretUpFill  onClick={() => upVotePost(postVoteAmount, props)} className='upArrow'/>}                                                                                                        
+                                            {postVoteAmount}
+                                        {downVoteStatus ? <CaretDownFill className='downArrowActive'/> : <CaretDownFill onClick={() => downVotePost(postVoteAmount, props)} className='downArrow'/>}                                                                                                             
+                                    </div> 
+            }
         <div className="second-column">
              <div className='post-user'>Posted by {props.currentPost.user}<TimePosted props={props}/></div>
              <div className='post-title'>{props.currentPost.title}</div>
@@ -119,19 +184,70 @@ const ImagePost = ({props}) => {
         commentAmount = props.currentPost.comments.length;
     }
     const navigate = useNavigate();
-
     const postRoute = (props) => {
         let temp = props.props.props;
         temp.setCurrentPost(props.currentPost);
         navigate("/post");
     }
+    const ogProps = props.props.props;
+    const [postVoteAmount, setPostVoteAmount] = useState(0);
+    const [downVoteStatus, setDownVoteStatus] = useState(false);
+    const [upVoteStatus, setUpVoteStatus] = useState(false);
+
+    useEffect(() => {
+        setPostVoteAmount(props.currentPost.voteAmount);
+                let upVoteListArray = Object.entries(ogProps.upVoteList);
+        upVoteListArray.map((user) => {
+            let tempUID = "";
+            if (typeof ogProps.currentUserUID !== "string") {
+                tempUID = ogProps.currentUserUID.uid;
+            }
+            if (user[0] === ogProps.currentUserUID || user[0] === tempUID) {
+                let userArray = Object.entries(user[1]);
+                userArray.map((likedPost) => {
+                    if (props.currentPost.newUserKey === likedPost[0]) {
+                        if (likedPost[1].upVoteState === true) {
+                            setUpVoteStatus(true);
+                        }
+                    }
+                    
+                })
+            }
+        });
+        let downVoteListArray = Object.entries(ogProps.downVoteList);
+        downVoteListArray.map((user) => {
+            let tempUID = "";
+            if (typeof ogProps.currentUserUID !== "string") {
+                tempUID = ogProps.currentUserUID.uid;
+            }
+            if (user[0] === ogProps.currentUserUID || user[0] === tempUID) {
+                let userArray = Object.entries(user[1]);
+                userArray.map((unLikedPost) => {
+                    if (props.currentPost.newUserKey === unLikedPost[0]) {
+                        if (unLikedPost[1].downVoteState === true) {
+                            setDownVoteStatus(true);
+                        }
+                    }
+                    
+                })
+            }
+        });
+    }, [props.currentPost.voteAmount]);
+
     return (
         <div className="individual-post" onClick={() => postRoute(props)}>
-        <div className="first-column">
-             <CaretUpFill className='upArrow' onClick={() => signUp(props)}/>
-             {props.currentPost.voteAmount}
-             <CaretDownFill className='downArrow' onClick={() => signUp(props)}/>
-        </div>
+            {!ogProps.logInState && <div className="first-column" onClick={antiCloseForm}>
+                                            <CaretUpFill className='upArrow' onClick={() => signUp(props)}/>
+                                            {postVoteAmount}
+                                            <CaretDownFill className='downArrow' onClick={() => signUp(props)} />
+                                    </div> 
+            }
+            {ogProps.logInState && <div className="first-column" onClick={antiCloseForm}>
+                                        {upVoteStatus ? <CaretUpFill className='upArrowActive'/> : <CaretUpFill  onClick={() => upVotePost(postVoteAmount, props)} className='upArrow'/>}                                                                                                        
+                                            {postVoteAmount}
+                                        {downVoteStatus ? <CaretDownFill className='downArrowActive'/> : <CaretDownFill onClick={() => downVotePost(postVoteAmount, props)} className='downArrow'/>}                                                                                                             
+                                    </div>  
+            }
         <div className="second-column">
              <div className='post-user'>Posted by {props.currentPost.user}<TimePosted props={props} /></div>
              <div className='post-title'>{props.currentPost.title}</div>
@@ -149,17 +265,60 @@ const LinkPost = ({props}) => {
         commentAmount = props.currentPost.comments.length;
     }
     const navigate = useNavigate();
-
     const postRoute = (props) => {
         let temp = props.props.props;
         temp.setCurrentPost(props.currentPost);
         navigate("/post");
     }
+    const ogProps = props.props.props;
+    const [postVoteAmount, setPostVoteAmount] = useState(0);
+    const [downVoteStatus, setDownVoteStatus] = useState(false);
+    const [upVoteStatus, setUpVoteStatus] = useState(false);
+
+    useEffect(() => {
+        setPostVoteAmount(props.currentPost.voteAmount);
+                let upVoteListArray = Object.entries(ogProps.upVoteList);
+        upVoteListArray.map((user) => {
+            let tempUID = "";
+            if (typeof ogProps.currentUserUID !== "string") {
+                tempUID = ogProps.currentUserUID.uid;
+            }
+            if (user[0] === ogProps.currentUserUID || user[0] === tempUID) {
+                let userArray = Object.entries(user[1]);
+                userArray.map((likedPost) => {
+                    if (props.currentPost.newUserKey === likedPost[0]) {
+                        if (likedPost[1].upVoteState === true) {
+                            setUpVoteStatus(true);
+                        }
+                    }
+                    
+                })
+            }
+        });
+        let downVoteListArray = Object.entries(ogProps.downVoteList);
+        downVoteListArray.map((user) => {
+            let tempUID = "";
+            if (typeof ogProps.currentUserUID !== "string") {
+                tempUID = ogProps.currentUserUID.uid;
+            }
+            if (user[0] === ogProps.currentUserUID || user[0] === tempUID) {
+                let userArray = Object.entries(user[1]);
+                userArray.map((unLikedPost) => {
+                    if (props.currentPost.newUserKey === unLikedPost[0]) {
+                        if (unLikedPost[1].downVoteState === true) {
+                            setDownVoteStatus(true);
+                        }
+                    }
+                    
+                })
+            }
+        });
+    }, [props.currentPost.voteAmount]);
 
      let temp = props.currentPost.title;
      let tempLink = props.currentPost.content;
-      let tempArr = temp.split('');
-      let tempArrLink = tempLink.split('');
+     let tempArr = temp.split('');
+     let tempArrLink = tempLink.split('');
      let truncated = [];
      let truncatedLink = [];
      for (let i = 0; i <= 40; ++i) {
@@ -173,11 +332,18 @@ const LinkPost = ({props}) => {
     
     return (
         <div className="individual-post-link"  onClick={() => postRoute(props)}>
-            <div className="first-column">
-                <CaretUpFill className='upArrow' onClick={() => signUp(props)}/>
-                {props.currentPost.voteAmount}
-                <CaretDownFill className='downArrow' onClick={() => signUp(props)}/>
-            </div>
+            {!ogProps.logInState && <div className="first-column" onClick={antiCloseForm}>
+                                        <CaretUpFill className='upArrow' onClick={() => signUp(props)}/>
+                                        {postVoteAmount}
+                                        <CaretDownFill className='downArrow' onClick={() => signUp(props)} />
+                                    </div> 
+            }
+            {ogProps.logInState &&  <div className="first-column" onClick={antiCloseForm}>
+                                        {upVoteStatus ? <CaretUpFill className='upArrowActive'/> : <CaretUpFill  onClick={() => upVotePost(postVoteAmount, props)} className='upArrow'/>}                                                                                                        
+                                            {postVoteAmount}
+                                        {downVoteStatus ? <CaretDownFill className='downArrowActive'/> : <CaretDownFill onClick={() => downVotePost(postVoteAmount, props)} className='downArrow'/>}                                                                                                             
+                                    </div> 
+            }
             
             <div className="second-column">
                     <div className='post-user'>Posted by {props.currentPost.user}<TimePosted props={props}/></div>
@@ -204,7 +370,7 @@ const LinkPost = ({props}) => {
 const topBoard = ({props}) => {
     let firstTemp = props.masterBoard;
     if (!Array.isArray(firstTemp)) {
-        firstTemp = Object.values(firstTemp);
+       firstTemp = Object.values(firstTemp);
     }
     let temp = [...firstTemp];
     temp.sort((a, b) => {
@@ -219,7 +385,11 @@ const newBoard = ({props}) => {
     }
     let temp = [...firstTemp];
     for (let i = 0; i < firstTemp.length; ++i) {
-        firstTemp[i].timePosted = firstTemp[i].timePosted.split('-').join('');
+        if (firstTemp[i].timePosted === undefined) {
+            break;
+        } else {
+            firstTemp[i].timePosted = firstTemp[i].timePosted.split('-').join('');
+        }
     }
     temp.sort((a, b) => {
         return b.timePosted - a.timePosted;
@@ -227,6 +397,9 @@ const newBoard = ({props}) => {
     let normal = [];
     let indvNormal = [];
     for (let i = 0; i < temp.length; ++i) {
+        if (temp[i].timePosted === undefined) {
+            break;
+        }
         let tempDateArray = temp[i].timePosted.split('');
         for (let j = 0; j <= tempDateArray.length; ++j) {
             if ( j === 4 || j === 6 )  {
@@ -251,7 +424,11 @@ const oldBoard = ({props}) => {
     }
     let temp = [...firstTemp];
     for (let i = 0; i < firstTemp.length; ++i) {
-        firstTemp[i].timePosted = firstTemp[i].timePosted.split('-').join('');
+        if (firstTemp[i].timePosted === undefined) {
+            break;
+        } else {
+            firstTemp[i].timePosted = firstTemp[i].timePosted.split('-').join('');
+        }
     }
     temp.sort((a, b) => {
         return a.timePosted - b.timePosted;
@@ -259,6 +436,9 @@ const oldBoard = ({props}) => {
     let normal = [];
     let indvNormal = [];
     for (let i = 0; i < temp.length; ++i) {
+        if (temp[i].timePosted === undefined) {
+            break;
+        }
         let tempDateArray = temp[i].timePosted.split('');
         for (let j = 0; j <= tempDateArray.length; ++j) {
             if ( j === 4 || j === 6 )  {

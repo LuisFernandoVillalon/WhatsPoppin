@@ -17,7 +17,7 @@ const LogInForm = (props) => {
         const password = passwordRef.current.value;
 
         const user = await logInUser(email, password);
-        console.log({user});
+        localStorage.setItem("currentUserUID", user.uid);
         localStorage.setItem("loginStatus", true);
         localStorage.setItem("currentUser", user.displayName);
 
@@ -25,6 +25,34 @@ const LogInForm = (props) => {
         props.props.setLogInState(localStorage.getItem("loginStatus"));
         props.props.setLogIn(false);
         props.props.setSignUp(false);
+        props.props.setCurrentUserUID(user);
+        // const ogProps = props.props;
+        //     let upVoteListArray = Object.entries(ogProps.upVoteList);
+        //     upVoteListArray.map((user) => {
+        //         if (user[0] === ogProps.currentUserUID) {
+        //             let userArray = Object.entries(user[1]);
+        //             userArray.map((likedPost) => {
+        //                 if (props.currentPost.newUserKey === likedPost[0]) {
+        //                 ogProps.setUpVoteStatus(true);
+        //                 }
+                        
+        //             })
+        //         }
+        //     });
+        // let downVoteListArray = Object.entries(ogProps.downVoteList);
+        // downVoteListArray.map((user) => {
+        //     if (user[0] === ogProps.currentUserUID) {
+        //         let userArray = Object.entries(user[1]);
+        //         userArray.map((unLikedPost) => {
+        //             if (props.currentPost.newUserKey === unLikedPost[0]) {
+        //                ogProps.setDownVoteStatus(true);
+        //             }
+                    
+        //         })
+        //     }
+        // });
+        // console.log(ogProps.upVoteStatus)
+        
         props.useScroll();
         event.target.reset();
     } 
