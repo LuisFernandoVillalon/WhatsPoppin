@@ -27,8 +27,14 @@ const Header = (props) => {
        if (e.target.value === "") {
         return props.setSearchResult([]);
        }
-       let temp = props.masterBoard;
+       let temp = "";
+    //    if (props.masterBoard.sampleBoard) {
+    //     temp = props.masterBoard.sampleBoard
+    // } else {
+        temp = props.masterBoard;
+    // }
        if (!Array.isArray(temp)) {
+        
             temp = Object.entries(temp).filter((data) => {
                 if (data[0] !== "downVoteList" && data[0] !== "upVoteList") {
                     return data;
@@ -47,20 +53,12 @@ const Header = (props) => {
                         }
                 })
                 const ans = temp.filter((post) => {
-                    console.log(post);
                     let a = post.title.toLowerCase();
                     let b = props.searchInput.toLowerCase();
                     return a.match(b);
                 });           
                 props.setSearchResult(ans);
         }
-        // const ans = temp.filter((post) => {
-        //     let a = post[1].title.toLowerCase();
-        //     let b = props.searchInput.toLowerCase();
-        //     return a.match(b);
-        // });
-
-        // props.setSearchResult(ans);
 
     };
     let temp = props.searchResult;

@@ -26,34 +26,12 @@ const LogInForm = (props) => {
         props.props.setLogIn(false);
         props.props.setSignUp(false);
         props.props.setCurrentUserUID(user);
-        // const ogProps = props.props;
-        //     let upVoteListArray = Object.entries(ogProps.upVoteList);
-        //     upVoteListArray.map((user) => {
-        //         if (user[0] === ogProps.currentUserUID) {
-        //             let userArray = Object.entries(user[1]);
-        //             userArray.map((likedPost) => {
-        //                 if (props.currentPost.newUserKey === likedPost[0]) {
-        //                 ogProps.setUpVoteStatus(true);
-        //                 }
-                        
-        //             })
-        //         }
-        //     });
-        // let downVoteListArray = Object.entries(ogProps.downVoteList);
-        // downVoteListArray.map((user) => {
-        //     if (user[0] === ogProps.currentUserUID) {
-        //         let userArray = Object.entries(user[1]);
-        //         userArray.map((unLikedPost) => {
-        //             if (props.currentPost.newUserKey === unLikedPost[0]) {
-        //                ogProps.setDownVoteStatus(true);
-        //             }
-                    
-        //         })
-        //     }
-        // });
-        // console.log(ogProps.upVoteStatus)
-        
         props.useScroll();
+
+        props.props.setMasterBoard(props.props.masterBoard)
+        props.props.setVoteList(props.props.voteList)
+        
+
         event.target.reset();
     } 
 
@@ -72,9 +50,11 @@ const LogInForm = (props) => {
                         <input className="input-form" ref={emailRef} type="email" placeholder="Email"/>
                         <input className="input-form" ref={passwordRef} type="password" placeholder="Password" />
                         <button className="login-button-form">Log In</button>
-                        <p className="small-text-form">Don't have an account? <p className="small-text-form-blue"
-                            onClick={() => {switchToSignUpForm(props)}}
-                        >SIGN UP</p></p>
+                        <p className="small-text-form">
+                            Don't have an account? 
+                        <p className="small-text-form-blue" onClick={() => {switchToSignUpForm(props)}}>
+                            SIGN UP
+                        </p></p>
                     </div>
                 </div>
             </form>

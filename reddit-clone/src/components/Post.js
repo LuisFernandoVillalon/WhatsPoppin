@@ -1,8 +1,8 @@
 import { CaretUpFill, CaretDownFill, ChatSquare, BoxArrowUpRight } from 'react-bootstrap-icons'; 
 import  CommentSection  from "./CommentSection";
 import uniqid from 'uniqid';
-import { useState, useEffect } from "react";
-import { upVoteIndividualPostFirebase, downVoteIndividualPostFirebase } from '../MessageBoardSample/firebaseData';
+import { useState, useEffect, useRef } from "react";
+import { downVoteIndividualPostFirebase, upVoteIndividualPostFirebase, addCommentToFirebase } from '../MessageBoardSample/firebaseData';
 
 const Post = ({masterBoard,
     setMasterBoard,
@@ -15,8 +15,8 @@ const Post = ({masterBoard,
     logInState,
     currentUserUID,
     entryMB,
-    upVoteList,
-    downVoteList
+    voteList,
+    setVoteList
 }) => {
     let type = currentPost.type;
     
@@ -33,8 +33,8 @@ const Post = ({masterBoard,
                         logInState={logInState}
                         currentUserUID={currentUserUID}
                         entryMB={entryMB}
-                        upVoteList={upVoteList}
-                        downVoteList={downVoteList}
+                        voteList={voteList}
+                        setVoteList={setVoteList}
                         key={uniqid()}
                 /> )
       }  else if (type === "image") {
@@ -50,8 +50,8 @@ const Post = ({masterBoard,
                         logInState={logInState}
                         currentUserUID={currentUserUID}
                         entryMB={entryMB}
-                        upVoteList={upVoteList}
-                        downVoteList={downVoteList}
+                        voteList={voteList}
+                        setVoteList={setVoteList}
                         key={uniqid()}
                 /> )
       } else if (type === "link") {
@@ -67,8 +67,8 @@ const Post = ({masterBoard,
                         logInState={logInState}
                         currentUserUID={currentUserUID}
                         entryMB={entryMB}
-                        upVoteList={upVoteList}
-                        downVoteList={downVoteList}
+                        voteList={voteList}
+                        setVoteList={setVoteList}
                         key={uniqid()}
                 /> )
      }
@@ -79,12 +79,14 @@ const displaySignUp = ({setSignUp}) => {
 const displayLogIn = ({setLogIn}) => {
     setLogIn(true);
 }
-const upVotePost = (postVoteAmount, currentPost, currentUserUID, entryMB) => {
-    const props = {currentPost, currentUserUID, entryMB};
+const upVotePost = (postVoteAmount, currentPost, currentUserUID, entryMB, masterBoard, setMasterBoard, voteList, setVoteList) => {
+    const props = {currentPost, currentUserUID, entryMB, voteList, setVoteList, masterBoard, setMasterBoard};
     upVoteIndividualPostFirebase(postVoteAmount + 1, props);
 }
-const downVotePost = (postVoteAmount, currentPost, currentUserUID, entryMB) => {
-    const props = {currentPost, currentUserUID, entryMB};
+const downVotePost = (postVoteAmount, currentPost, currentUserUID, entryMB, masterBoard, setMasterBoard, voteList, setVoteList) => {
+    
+    const props = {currentPost, currentUserUID, entryMB, voteList, setVoteList, masterBoard, setMasterBoard};
+    
     downVoteIndividualPostFirebase(postVoteAmount - 1, props);
 }
 const TextPostPage = ({
@@ -99,67 +101,65 @@ const TextPostPage = ({
     logInState,
     currentUserUID,
     entryMB,
-    upVoteList,
-    downVoteList
+    voteList,
+    setVoteList
 }) => {
    
     let commentAmount = 0;
-    if (currentPost.comments[0] === "") {
+    if (currentPost.comments === undefined) {
         commentAmount = 0;
     } else {
         commentAmount = currentPost.comments.length;
     }
-
-    const [postVoteAmount, setPostVoteAmount] = useState(0);
+    const [postVoteAmount, setPostVoteAmount] = useState(currentPost.voteAmount);
     const [downVoteStatus, setDownVoteStatus] = useState(false);
     const [upVoteStatus, setUpVoteStatus] = useState(false);
-    useEffect(() => {
-        const tempMB = Object.entries(masterBoard);
-        tempMB.map((currentPostID) => {
-            if (currentPostID[0] === currentPost.newUserKey) {
-                setPostVoteAmount(currentPostID[1].voteAmount)
+    const [commentArray, setCommentArray] = useState([]);
+
+    const commentRef = useRef(undefined);
+
+     useEffect(() => {
+
+        setPostVoteAmount(currentPost.voteAmount);
+        let voteListArray = Object.entries(voteList);
+        voteListArray.map((user) => {
+            if (user[1].currentUser === currentUserUID.uid || user[1].currentUser === currentUserUID) {
+                if (user[1].post === undefined || user[1].post === null) {
+                    return;
+                } else {
+                    let userArray = Object.entries(user[1].post);
+                    userArray.map((post) => {
+                        if (currentPost.id === post[1].currentPostID) {
+                            setUpVoteStatus(post[1].upVoteState);
+                            setDownVoteStatus(post[1].downVoteState);
+                        }
+                    })
+                }  
             }
         })
-        let upVoteListArray = Object.entries(upVoteList);
-        upVoteListArray.map((user) => {
-            let tempUID = "";
-            if (typeof currentUserUID !== "string") {
-                tempUID = currentUserUID.uid;
-            }
-            if (user[0] === currentUserUID || user[0] === tempUID) {
-                let userArray = Object.entries(user[1]);
-                userArray.map((likedPost) => {
-                    if (currentPost.newUserKey === likedPost[0]) {
-                        if (likedPost[1].upVoteState === true) {
-                            setUpVoteStatus(true);
-                        }
-                    }
-                    
-                })
-            }
-        });
-        let downVoteListArray = Object.entries(downVoteList);
-        downVoteListArray.map((user) => {
-            let tempUID = "";
-            if (typeof currentUserUID !== "string") {
-                tempUID = currentUserUID.uid;
-            }
-            if (user[0] === currentUserUID || user[0] === tempUID) {
-                let userArray = Object.entries(user[1]);
-                userArray.map((unLikedPost) => {
-                    if (currentPost.newUserKey === unLikedPost[0]) {
-                        if (unLikedPost[1].downVoteState === true) {
-                            setDownVoteStatus(true);
-                        }
-                    }
-                    
-                })
-            }
-        });
-    }, [currentPost.voteAmount]);
+     }, [upVoteStatus, downVoteStatus]);
 
+    const handleSubmit = (event) => {
+        event.preventDefault();
+
+        const text = commentRef.current.value;
+        if (text === "") {
+            return;
+        }
+        const user = localStorage.getItem("currentUser");
+        const id = uniqid();
+        let timePost = new Date();
+        timePost = timePost.toISOString().split('T')[0];
+        let voteAmount = 1; 
+        let comments= [];
+
+       addCommentToFirebase(user, id, timePost, voteAmount, text, comments, currentPost, setMasterBoard, setVoteList);
+
+        event.target.reset();
+    }
+    
     return (
-        <div className="individual-post-page" >
+     <div className="individual-post-page" >
         {!logInState && <div className="first-column">
                             <CaretUpFill className='upArrow' onClick={() => displaySignUp({setSignUp})}/>
                                 {postVoteAmount}
@@ -167,9 +167,9 @@ const TextPostPage = ({
                         </div>
         }
         {logInState && <div className="first-column">
-                            {upVoteStatus ? <CaretUpFill className='upArrowActive'/> : <CaretUpFill  onClick={() => upVotePost(postVoteAmount, currentPost, currentUserUID, entryMB)} className='upArrow'/>}                                                                                                        
+                            {upVoteStatus ? <CaretUpFill className='upArrowActive'/> : <CaretUpFill  onClick={() => upVotePost(postVoteAmount, currentPost, currentUserUID, entryMB, masterBoard, setMasterBoard, voteList, setVoteList)} className='upArrow'/>}                                                                                                        
                                 {postVoteAmount}
-                            {downVoteStatus ? <CaretDownFill className='downArrowActive'/> : <CaretDownFill onClick={() => downVotePost(postVoteAmount, currentPost, currentUserUID, entryMB)} className='downArrow'/>}                                                                                                             
+                            {downVoteStatus ? <CaretDownFill className='downArrowActive'/> : <CaretDownFill onClick={() => downVotePost(postVoteAmount, currentPost, currentUserUID, entryMB, masterBoard, setMasterBoard, voteList, setVoteList)} className='downArrow'/>}
                         </div>
         }
         <div className="second-column-page">
@@ -190,13 +190,15 @@ const TextPostPage = ({
                             </div>
             }
             {logInState && <div className='post-comment-container'>
+                            <form onSubmit={handleSubmit}>
                                 <p className='comment-label'>Comment as {localStorage.getItem("currentUser")}</p>
                                 <div className='post-comment-input-container'>
-                                    <textarea className='post-comment-input' placeholder='What are your thoughts?'></textarea>
+                                    <textarea ref={commentRef} className='post-comment-input' placeholder='What are your thoughts?'></textarea>
                                     <div className='post-comment-button-container'>
                                         <button className='post-comment-button'>COMMENT</button>
                                     </div>
                                 </div>
+                            </form>
                            </div>
             }
              <CommentSection 
@@ -208,6 +210,10 @@ const TextPostPage = ({
                 setLogIn={setLogIn}
                 signUp={signUp}
                 setSignUp={setSignUp} 
+                logInState={logInState}
+                commentArray={commentArray}
+                setCommentArray={setCommentArray}
+                setVoteList={setVoteList}
                 key={uniqid()}
              />
         </div>
@@ -227,8 +233,8 @@ const ImagePostPage = ({
     logInState,
     currentUserUID,
     entryMB,
-    upVoteList,
-    downVoteList
+    voteList,
+    setVoteList
 }) => {
     let commentAmount = 0;
     if (currentPost.comments[0] === "") {
@@ -237,53 +243,52 @@ const ImagePostPage = ({
         commentAmount = currentPost.comments.length;
     }
 
-    const [postVoteAmount, setPostVoteAmount] = useState(0);
+    const [postVoteAmount, setPostVoteAmount] = useState(currentPost.voteAmount);
     const [downVoteStatus, setDownVoteStatus] = useState(false);
     const [upVoteStatus, setUpVoteStatus] = useState(false);
-    useEffect(() => {
-        const tempMB = Object.entries(masterBoard);
-        tempMB.map((currentPostID) => {
-            if (currentPostID[0] === currentPost.newUserKey) {
-                setPostVoteAmount(currentPostID[1].voteAmount)
+    const [commentArray, setCommentArray] = useState([]);
+
+    const commentRef = useRef(undefined);
+
+     useEffect(() => {
+
+        setPostVoteAmount(currentPost.voteAmount);
+        let voteListArray = Object.entries(voteList);
+        voteListArray.map((user) => {
+            if (user[1].currentUser === currentUserUID.uid || user[1].currentUser === currentUserUID) {
+                if (user[1].post === undefined || user[1].post === null) {
+                    return;
+                } else {
+                    let userArray = Object.entries(user[1].post);
+                    userArray.map((post) => {
+                        if (currentPost.id === post[1].currentPostID) {
+                            setUpVoteStatus(post[1].upVoteState);
+                            setDownVoteStatus(post[1].downVoteState);
+                        }
+                    })
+                } 
             }
         })
-        let upVoteListArray = Object.entries(upVoteList);
-        upVoteListArray.map((user) => {
-            let tempUID = "";
-            if (typeof currentUserUID !== "string") {
-                tempUID = currentUserUID.uid;
-            }
-            if (user[0] === currentUserUID || user[0] === tempUID) {
-                let userArray = Object.entries(user[1]);
-                userArray.map((likedPost) => {
-                    if (currentPost.newUserKey === likedPost[0]) {
-                        if (likedPost[1].upVoteState === true) {
-                            setUpVoteStatus(true);
-                        }
-                    }
-                    
-                })
-            }
-        });
-        let downVoteListArray = Object.entries(downVoteList);
-        downVoteListArray.map((user) => {
-            let tempUID = "";
-            if (typeof currentUserUID !== "string") {
-                tempUID = currentUserUID.uid;
-            }
-            if (user[0] === currentUserUID || user[0] === tempUID) {
-                let userArray = Object.entries(user[1]);
-                userArray.map((unLikedPost) => {
-                    if (currentPost.newUserKey === unLikedPost[0]) {
-                        if (unLikedPost[1].downVoteState === true) {
-                            setDownVoteStatus(true);
-                        }
-                    }
-                    
-                })
-            }
-        });
-    }, [currentPost.voteAmount]);
+     }, [upVoteStatus, downVoteStatus]);
+
+    const handleSubmit = (event) => {
+        event.preventDefault();
+
+        const text = commentRef.current.value;
+        if (text === "") {
+            return;
+        }
+        const user = localStorage.getItem("currentUser");
+        const id = uniqid();
+        let timePost = new Date();
+        timePost = timePost.toISOString().split('T')[0];
+        let voteAmount = 1; 
+        let comments= [];
+
+       addCommentToFirebase(user, id, timePost, voteAmount, text, comments, currentPost, setMasterBoard);
+
+        event.target.reset();
+    }
 
     return (
         <div className="individual-post-page">
@@ -294,9 +299,9 @@ const ImagePostPage = ({
                         </div>
         }
         {logInState && <div className="first-column">
-                            {upVoteStatus ? <CaretUpFill className='upArrowActive'/> : <CaretUpFill  onClick={() => upVotePost(postVoteAmount, currentPost, currentUserUID, entryMB)} className='upArrow'/>}                                                                                                        
+                            {upVoteStatus ? <CaretUpFill className='upArrowActive'/> : <CaretUpFill  onClick={() => upVotePost(postVoteAmount, currentPost, currentUserUID, entryMB, masterBoard, setMasterBoard, voteList, setVoteList)} className='upArrow'/>}                                                                                                        
                                 {postVoteAmount}
-                            {downVoteStatus ? <CaretDownFill className='downArrowActive'/> : <CaretDownFill onClick={() => downVotePost(postVoteAmount, currentPost, currentUserUID, entryMB)} className='downArrow'/>}                                                                                                             
+                            {downVoteStatus ? <CaretDownFill className='downArrowActive'/> : <CaretDownFill onClick={() => downVotePost(postVoteAmount, currentPost, currentUserUID, entryMB, masterBoard, setMasterBoard, voteList, setVoteList)} className='downArrow'/>}                                                                                                             
                         </div>
         }
             <div className="second-column-page">
@@ -313,14 +318,16 @@ const ImagePostPage = ({
                             </div>
                 }
                 {logInState && <div className='post-comment-container'>
-                                <p className='comment-label'>Comment as {localStorage.getItem("currentUser")}</p>
-                                <div className='post-comment-input-container'>
-                                    <textarea className='post-comment-input' placeholder='What are your thoughts?'></textarea>
-                                    <div className='post-comment-button-container'>
-                                        <button className='post-comment-button'>COMMENT</button>
+                                <form onSubmit={handleSubmit}>
+                                    <p className='comment-label'>Comment as {localStorage.getItem("currentUser")}</p>
+                                    <div className='post-comment-input-container'>
+                                        <textarea  ref={commentRef} className='post-comment-input' placeholder='What are your thoughts?'></textarea>
+                                        <div className='post-comment-button-container'>
+                                            <button className='post-comment-button'>COMMENT</button>
+                                        </div>
                                     </div>
+                                    </form>
                                 </div>
-                           </div>
                 }
                 <CommentSection 
                     masterBoard={masterBoard}
@@ -331,6 +338,10 @@ const ImagePostPage = ({
                     setLogIn={setLogIn}
                     signUp={signUp}
                     setSignUp={setSignUp} 
+                    logInState={logInState}
+                    commentArray={commentArray}
+                    setCommentArray={setCommentArray}
+                    setVoteList={setVoteList}
                     key={uniqid()}
                  />
             </div>
@@ -349,8 +360,8 @@ const LinkPostPage = ({
     logInState,
     currentUserUID,
     entryMB,
-    upVoteList,
-    downVoteList
+    voteList,
+    setVoteList
 }) => {
     let commentAmount = 0;
     if (currentPost.comments[0] === "") {
@@ -367,54 +378,62 @@ const LinkPostPage = ({
     truncated.push("...");
     truncated.toString('');
 
-    const [postVoteAmount, setPostVoteAmount] = useState(0);
+    const [postVoteAmount, setPostVoteAmount] = useState(currentPost.voteAmount);
     const [downVoteStatus, setDownVoteStatus] = useState(false);
     const [upVoteStatus, setUpVoteStatus] = useState(false);
-    useEffect(() => {
-        const tempMB = Object.entries(masterBoard);
-        tempMB.map((currentPostID) => {
-            if (currentPostID[0] === currentPost.newUserKey) {
-                setPostVoteAmount(currentPostID[1].voteAmount)
+    const [commentArray, setCommentArray] = useState([]);
+
+    const commentRef = useRef(undefined);
+
+     useEffect(() => {
+
+        setPostVoteAmount(currentPost.voteAmount);
+        let voteListArray = Object.entries(voteList);
+        voteListArray.map((user) => {
+            if (user[1].currentUser === currentUserUID.uid || user[1].currentUser === currentUserUID) {
+                if (user[1].post === undefined || user[1].post === null) {
+                    return;
+                } else {
+                    let userArray = Object.entries(user[1].post);
+                    userArray.map((post) => {
+                        if (currentPost.id === post[1].currentPostID) {
+                            setUpVoteStatus(post[1].upVoteState);
+                            setDownVoteStatus(post[1].downVoteState);
+                        }
+                    })
+                }  
             }
         })
-        let upVoteListArray = Object.entries(upVoteList);
-        upVoteListArray.map((user) => {
-            let tempUID = "";
-            if (typeof currentUserUID !== "string") {
-                tempUID = currentUserUID.uid;
-            }
-            if (user[0] === currentUserUID || user[0] === tempUID) {
-                let userArray = Object.entries(user[1]);
-                userArray.map((likedPost) => {
-                    if (currentPost.newUserKey === likedPost[0]) {
-                        if (likedPost[1].upVoteState === true) {
-                            setUpVoteStatus(true);
-                        }
-                    }
-                    
-                })
-            }
-        });
-        let downVoteListArray = Object.entries(downVoteList);
-        downVoteListArray.map((user) => {
-            let tempUID = "";
-            if (typeof currentUserUID !== "string") {
-                tempUID = currentUserUID.uid;
-            }
-            if (user[0] === currentUserUID || user[0] === tempUID) {
-                let userArray = Object.entries(user[1]);
-                userArray.map((unLikedPost) => {
-                    if (currentPost.newUserKey === unLikedPost[0]) {
-                        if (unLikedPost[1].downVoteState === true) {
-                            setDownVoteStatus(true);
-                        }
-                    }
-                    
-                })
-            }
-        });
-    }, [currentPost.voteAmount]);
-   
+     }, [upVoteStatus, downVoteStatus]);
+
+    const handleSubmit = (event) => {
+        event.preventDefault();
+
+        const text = commentRef.current.value;
+        if (text === "") {
+            return;
+        }
+        const user = localStorage.getItem("currentUser");
+        const id = uniqid();
+        let timePost = new Date();
+        timePost = timePost.toISOString().split('T')[0];
+        let voteAmount = 1; 
+        let comments= [];
+
+       addCommentToFirebase(user, id, timePost, voteAmount, text, comments, currentPost, setMasterBoard);
+
+        event.target.reset();
+    }
+
+    let tempLink = currentPost.content;
+    let tempArrLink = tempLink.split('');
+    let truncatedLink = [];
+    for (let i = 0; i <= 40; ++i) {
+        truncatedLink.push(tempArrLink[i]);
+    }
+    truncatedLink.push("...");
+    truncatedLink.toString('');
+
    return (
        <div className="individual-post-link-page">
         {!logInState && <div className="first-column">
@@ -424,16 +443,16 @@ const LinkPostPage = ({
                         </div>
         }
         {logInState && <div className="first-column">
-                            {upVoteStatus ? <CaretUpFill className='upArrowActive'/> : <CaretUpFill  onClick={() => upVotePost(postVoteAmount, currentPost, currentUserUID, entryMB)} className='upArrow'/>}                                                                                                        
+                            {upVoteStatus ? <CaretUpFill className='upArrowActive'/> : <CaretUpFill  onClick={() => upVotePost(postVoteAmount, currentPost, currentUserUID, entryMB, masterBoard, setMasterBoard, voteList, setVoteList)} className='upArrow'/>}                                                                                                        
                                 {postVoteAmount}
-                            {downVoteStatus ? <CaretDownFill className='downArrowActive'/> : <CaretDownFill onClick={() => downVotePost(postVoteAmount, currentPost, currentUserUID, entryMB)} className='downArrow'/>}                                                                                                             
+                            {downVoteStatus ? <CaretDownFill className='downArrowActive'/> : <CaretDownFill onClick={() => downVotePost(postVoteAmount, currentPost, currentUserUID, entryMB, masterBoard, setMasterBoard, voteList, setVoteList)} className='downArrow'/>}                                                                                                             
                         </div>
         }
            
            <div className="second-column-page">
                    <div className='post-user'>Posted by {currentPost.user}<TimeCommentPosted currentPost={currentPost} key={uniqid()}/></div>
                    <div className='post-title-link'>{currentPost.title}</div>
-                   <a  rel="noreferrer" target="_blank" className='post-link-page' href={currentPost.content}>{currentPost.content}<BoxArrowUpRight/></a>
+                   <a  rel="noreferrer" target="_blank" className='post-link-page' href={currentPost.content}>{truncatedLink}<BoxArrowUpRight/></a>
                    <div className='post-comments'><ChatSquare /> {commentAmount} Comments</div>
                    {!logInState && <div className='login-post-container'>
                                 <p>Log in or sign up to leave a comment</p>
@@ -444,14 +463,16 @@ const LinkPostPage = ({
                             </div>
                     }
                     {logInState && <div className='post-comment-container'>
-                                <p className='comment-label'>Comment as {localStorage.getItem("currentUser")}</p>
-                                <div className='post-comment-input-container'>
-                                    <textarea className='post-comment-input' placeholder='What are your thoughts?'></textarea>
-                                    <div className='post-comment-button-container'>
-                                        <button className='post-comment-button'>COMMENT</button>
+                                        <form onSubmit={handleSubmit}>
+                                            <p className='comment-label'>Comment as {localStorage.getItem("currentUser")}</p>
+                                            <div className='post-comment-input-container'>
+                                                <textarea ref={commentRef} className='post-comment-input' placeholder='What are your thoughts?'></textarea>
+                                                <div className='post-comment-button-container'>
+                                                    <button className='post-comment-button'>COMMENT</button>
+                                                </div>
+                                            </div>
+                                        </form>
                                     </div>
-                                </div>
-                           </div>
                     } 
                     <CommentSection 
                         masterBoard={masterBoard}
@@ -462,6 +483,10 @@ const LinkPostPage = ({
                         setLogIn={setLogIn}
                         signUp={signUp}
                         setSignUp={setSignUp} 
+                        logInState={logInState}
+                        commentArray={commentArray}
+                        setCommentArray={setCommentArray}
+                        setVoteList={setVoteList}
                         key={uniqid()}
                     />
             </div>
@@ -526,6 +551,8 @@ const TimeCommentPosted = ({currentPost}) => {
     let numPostedYear = Number(tempPostedYear);
     let getMonth = numPostedMonth - numCurrMonth;
     getMonth = Math.abs(getMonth);
+    // console.log([{numCurrDay}, {numCurrMonth}, {numCurrYear}])
+    // console.log([{numPostedDay},{numPostedMonth},{numPostedYear}])
     if (numCurrYear === numPostedYear) {
         if (numCurrMonth === numPostedMonth) {
             if (numCurrDay === numPostedDay) {
@@ -555,27 +582,27 @@ const TimeCommentPosted = ({currentPost}) => {
     } else if (numPostedYear === numCurrYear - 1) {
         if (numCurrMonth === numPostedMonth) {
             timePosted = "1 year ago";
-        } else if (numPostedMonth === numCurrMonth + 1 ) {
+        } else if (numPostedMonth === numCurrMonth - 1  || numPostedMonth === numCurrMonth + 1 ) {
             timePosted = "11 months ago";
-        } else if (numPostedMonth === numCurrMonth + 2 ) {
+        } else if (numPostedMonth === numCurrMonth - 2  || numPostedMonth === numCurrMonth + 2 ) {
             timePosted = "10 months ago";
-        } else if (numPostedMonth === numCurrMonth + 3 ) {
+        } else if (numPostedMonth === numCurrMonth - 3  || numPostedMonth === numCurrMonth + 3 ) {
             timePosted = "9 months ago";
-        } else if (numPostedMonth === numCurrMonth + 4 ) {
+        } else if (numPostedMonth === numCurrMonth - 4  || numPostedMonth === numCurrMonth + 4 ) {
             timePosted = "8 months ago";
-        } else if (numPostedMonth === numCurrMonth + 5 ) {
+        } else if (numPostedMonth === numCurrMonth - 5  || numPostedMonth === numCurrMonth + 5 ) {
             timePosted = "7 months ago";
-        } else if (numPostedMonth === numCurrMonth + 6 ) {
+        } else if (numPostedMonth === numCurrMonth - 6  || numPostedMonth === numCurrMonth + 6 ) {
             timePosted = "6 months ago";
-        } else if (numPostedMonth === numCurrMonth + 7 ) {
+        } else if (numPostedMonth === numCurrMonth - 7  || numPostedMonth === numCurrMonth + 7 ) {
             timePosted = "5 months ago";
-        } else if (numPostedMonth === numCurrMonth + 8 ) {
+        } else if (numPostedMonth === numCurrMonth - 8  || numPostedMonth === numCurrMonth + 8 ) {
             timePosted = "4 months ago";
-        } else if (numPostedMonth === numCurrMonth + 9 ) {
+        } else if (numPostedMonth === numCurrMonth - 9  || numPostedMonth === numCurrMonth + 9 ) {
             timePosted = "3 months ago";
-        } else if (numPostedMonth === numCurrMonth + 10 ) {
+        } else if (numPostedMonth === numCurrMonth - 10  || numPostedMonth === numCurrMonth + 10 ) {
             timePosted = "2 months ago";
-        } else if (numPostedMonth === numCurrMonth + 11 ) {
+        } else if (numPostedMonth === numCurrMonth - 11  || numPostedMonth === numCurrMonth + 11 ) {
             timePosted = "1 month ago";
         }
     } else if (numPostedYear + 2 <= numCurrYear) {

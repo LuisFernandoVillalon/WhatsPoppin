@@ -3,7 +3,8 @@ import useScrollBlock from "./useScrollBlock";
 import { useNavigate } from "react-router-dom";
 import uniqid from 'uniqid';
 import { useState, useEffect, useRef } from "react";
-import { upVotePostFirebase, downVotePostFirebase } from '../MessageBoardSample/firebaseData';
+//import { upVotePostFirebase, downVotePostFirebase } from '../MessageBoardSample/firebaseData';
+import { upVotePostFirebase, downVotePostFirebase, getRecords } from '../MessageBoardSample/firebaseData';
 
 const HomeBoard = (props) => {
     const [blockScroll, useScroll] = useScrollBlock();
@@ -12,6 +13,11 @@ const HomeBoard = (props) => {
     const createPostRoute = () => {
             navigate("/create-post");
     }
+
+    useEffect(() => {
+        const {setMasterBoard, setEntryMB, setVoteList} = props;
+        getRecords({ setMasterBoard, setEntryMB, setVoteList});
+    }, []);
 
     return (
         <div>
@@ -42,14 +48,14 @@ const backTop = () => {
 }
 
 const MessageBoard = (props) => {
+
     let mB = props.props.masterBoard;
-    if (mB === null) {
-        mB = [];
-    }
+    // if (mB === null) {
+    //     mB = [];
+    // }
     if (!Array.isArray(mB)) {
         mB = Object.values(mB);
     }
-
     const boardList = mB.map((currentPost) => (
         <IndividualPost 
             currentPost={currentPost}
@@ -87,7 +93,7 @@ const antiCloseForm = (e) => {
     e.stopPropagation();
 }
 const upVotePost = (postVoteAmount, props) => {
-    upVotePostFirebase(postVoteAmount + 1, props)
+     upVotePostFirebase(postVoteAmount + 1, props);
 }
 const downVotePost = (postVoteAmount, props) => {
     downVotePostFirebase(postVoteAmount - 1, props);
@@ -95,7 +101,7 @@ const downVotePost = (postVoteAmount, props) => {
 
 const TextPost = ({props}) => {
     let commentAmount = 0;
-    if (props.currentPost.comments[0] === "") {
+    if ( props.currentPost.comments === undefined) {
         commentAmount = 0;
     } else {
         commentAmount = props.currentPost.comments.length;
@@ -113,47 +119,26 @@ const TextPost = ({props}) => {
     const [downVoteStatus, setDownVoteStatus] = useState(false);
     const [upVoteStatus, setUpVoteStatus] = useState(false);
 
-
     useEffect(() => {
         setPostVoteAmount(props.currentPost.voteAmount);
-        let upVoteListArray = Object.entries(ogProps.upVoteList);
-        upVoteListArray.map((user) => {
-            let tempUID = "";
-            if (typeof ogProps.currentUserUID !== "string") {
-                tempUID = ogProps.currentUserUID.uid;
-            }
-            if (user[0] === ogProps.currentUserUID || user[0] === tempUID) {
-                let userArray = Object.entries(user[1]);
-                userArray.map((likedPost) => {
-                    if (props.currentPost.newUserKey === likedPost[0]) {
-                        if (likedPost[1].upVoteState === true) {
-                            setUpVoteStatus(true);
+        let voteListArray = Object.entries(ogProps.voteList);
+        voteListArray.map((user) => {
+             if (user[1].currentUser === ogProps.currentUserUID.uid || user[1].currentUser === ogProps.currentUserUID) {
+                if (user[1].post === undefined || user[1].post === null) {
+                    return;
+                } else {
+                    let userArray = Object.entries(user[1].post);
+                    userArray.map((post) => {
+                        if (props.currentPost.id === post[1].currentPostID) {
+                            setUpVoteStatus(post[1].upVoteState);
+                            setDownVoteStatus(post[1].downVoteState);
                         }
-                    }
-                    
-                })
+                    })
+                } 
             }
-        });
-        let downVoteListArray = Object.entries(ogProps.downVoteList);
-        downVoteListArray.map((user) => {
-            let tempUID = "";
-            if (typeof ogProps.currentUserUID !== "string") {
-                tempUID = ogProps.currentUserUID.uid;
-            }
-            if (user[0] === ogProps.currentUserUID || user[0] === tempUID) {
-                let userArray = Object.entries(user[1]);
-                userArray.map((unLikedPost) => {
-                    if (props.currentPost.newUserKey === unLikedPost[0]) {
-                        if (unLikedPost[1].downVoteState === true) {
-                            setDownVoteStatus(true);
-                        }
-                    }
-                    
-                })
-            }
-        });
-    }, [props.currentPost.voteAmount]);
-    
+        })
+    }, [upVoteStatus, downVoteStatus]);
+
     return (
         <div className="individual-post"  onClick={() => postRoute(props)}>
             {!ogProps.logInState && <div className="first-column" onClick={antiCloseForm}>
@@ -196,43 +181,23 @@ const ImagePost = ({props}) => {
 
     useEffect(() => {
         setPostVoteAmount(props.currentPost.voteAmount);
-                let upVoteListArray = Object.entries(ogProps.upVoteList);
-        upVoteListArray.map((user) => {
-            let tempUID = "";
-            if (typeof ogProps.currentUserUID !== "string") {
-                tempUID = ogProps.currentUserUID.uid;
-            }
-            if (user[0] === ogProps.currentUserUID || user[0] === tempUID) {
-                let userArray = Object.entries(user[1]);
-                userArray.map((likedPost) => {
-                    if (props.currentPost.newUserKey === likedPost[0]) {
-                        if (likedPost[1].upVoteState === true) {
-                            setUpVoteStatus(true);
+        let voteListArray = Object.entries(ogProps.voteList);
+        voteListArray.map((user) => {
+             if (user[1].currentUser === ogProps.currentUserUID.uid || user[1].currentUser === ogProps.currentUserUID) {
+                if (user[1].post === undefined || user[1].post === null) {
+                    return;
+                } else {
+                    let userArray = Object.entries(user[1].post);
+                    userArray.map((post) => {
+                        if (props.currentPost.id === post[1].currentPostID) {
+                            setUpVoteStatus(post[1].upVoteState);
+                            setDownVoteStatus(post[1].downVoteState);
                         }
-                    }
-                    
-                })
+                    })
+                } 
             }
-        });
-        let downVoteListArray = Object.entries(ogProps.downVoteList);
-        downVoteListArray.map((user) => {
-            let tempUID = "";
-            if (typeof ogProps.currentUserUID !== "string") {
-                tempUID = ogProps.currentUserUID.uid;
-            }
-            if (user[0] === ogProps.currentUserUID || user[0] === tempUID) {
-                let userArray = Object.entries(user[1]);
-                userArray.map((unLikedPost) => {
-                    if (props.currentPost.newUserKey === unLikedPost[0]) {
-                        if (unLikedPost[1].downVoteState === true) {
-                            setDownVoteStatus(true);
-                        }
-                    }
-                    
-                })
-            }
-        });
-    }, [props.currentPost.voteAmount]);
+        })
+    }, []);
 
     return (
         <div className="individual-post" onClick={() => postRoute(props)}>
@@ -277,43 +242,23 @@ const LinkPost = ({props}) => {
 
     useEffect(() => {
         setPostVoteAmount(props.currentPost.voteAmount);
-                let upVoteListArray = Object.entries(ogProps.upVoteList);
-        upVoteListArray.map((user) => {
-            let tempUID = "";
-            if (typeof ogProps.currentUserUID !== "string") {
-                tempUID = ogProps.currentUserUID.uid;
-            }
-            if (user[0] === ogProps.currentUserUID || user[0] === tempUID) {
-                let userArray = Object.entries(user[1]);
-                userArray.map((likedPost) => {
-                    if (props.currentPost.newUserKey === likedPost[0]) {
-                        if (likedPost[1].upVoteState === true) {
-                            setUpVoteStatus(true);
+        let voteListArray = Object.entries(ogProps.voteList);
+        voteListArray.map((user) => {
+             if (user[1].currentUser === ogProps.currentUserUID.uid || user[1].currentUser === ogProps.currentUserUID) {
+                if (user[1].post === undefined || user[1].post === null) {
+                    return;
+                } else {
+                    let userArray = Object.entries(user[1].post);
+                    userArray.map((post) => {
+                        if (props.currentPost.id === post[1].currentPostID) {
+                            setUpVoteStatus(post[1].upVoteState);
+                            setDownVoteStatus(post[1].downVoteState);
                         }
-                    }
-                    
-                })
+                    })
+                } 
             }
-        });
-        let downVoteListArray = Object.entries(ogProps.downVoteList);
-        downVoteListArray.map((user) => {
-            let tempUID = "";
-            if (typeof ogProps.currentUserUID !== "string") {
-                tempUID = ogProps.currentUserUID.uid;
-            }
-            if (user[0] === ogProps.currentUserUID || user[0] === tempUID) {
-                let userArray = Object.entries(user[1]);
-                userArray.map((unLikedPost) => {
-                    if (props.currentPost.newUserKey === unLikedPost[0]) {
-                        if (unLikedPost[1].downVoteState === true) {
-                            setDownVoteStatus(true);
-                        }
-                    }
-                    
-                })
-            }
-        });
-    }, [props.currentPost.voteAmount]);
+        })
+    }, []);
 
      let temp = props.currentPost.title;
      let tempLink = props.currentPost.content;
@@ -369,6 +314,10 @@ const LinkPost = ({props}) => {
 
 const topBoard = ({props}) => {
     let firstTemp = props.masterBoard;
+    
+    if (firstTemp.sampleBoard) {
+        firstTemp = firstTemp.sampleBoard;
+    } 
     if (!Array.isArray(firstTemp)) {
        firstTemp = Object.values(firstTemp);
     }
@@ -376,10 +325,14 @@ const topBoard = ({props}) => {
     temp.sort((a, b) => {
         return b.voteAmount - a.voteAmount;
     });
+    // props.masterBoard.sampleBoard = temp;
     props.setMasterBoard(temp);
 }
 const newBoard = ({props}) => {
     let firstTemp = props.masterBoard;
+    if (firstTemp.sampleBoard) {
+        firstTemp = firstTemp.sampleBoard;
+    } 
     if (!Array.isArray(firstTemp)) {
         firstTemp = Object.values(firstTemp);
     }
@@ -415,10 +368,14 @@ const newBoard = ({props}) => {
     for (let i = 0; i < indvNormal.length; ++i) {
             temp[i].timePosted = indvNormal[i].join('');
     }
-      props.setMasterBoard(temp);
+    //props.masterBoard.sampleBoard = temp;
+    props.setMasterBoard(temp);
 }
 const oldBoard = ({props}) => {
     let firstTemp = props.masterBoard;
+    if (firstTemp.sampleBoard) {
+        firstTemp = firstTemp.sampleBoard;
+    } 
     if (!Array.isArray(firstTemp)) {
         firstTemp = Object.values(firstTemp);
     }
@@ -454,7 +411,8 @@ const oldBoard = ({props}) => {
     for (let i = 0; i < indvNormal.length; ++i) {
             temp[i].timePosted = indvNormal[i].join('');
     }
-      props.setMasterBoard(temp);
+    //props.masterBoard.sampleBoard = temp;
+    props.setMasterBoard(temp);
 }
 
 export const TimePosted = ({props}) => {
@@ -543,35 +501,33 @@ export const TimePosted = ({props}) => {
         } else if (numPostedYear === numCurrYear - 1) {
             if (numCurrMonth === numPostedMonth) {
                 timePosted = "1 year ago";
-            } else if (numPostedMonth === numCurrMonth + 1 ) {
+            } else if (numPostedMonth === numCurrMonth - 1  || numPostedMonth === numCurrMonth + 1) {
                 timePosted = "11 months ago";
-            } else if (numPostedMonth === numCurrMonth + 2 ) {
+            } else if (numPostedMonth === numCurrMonth - 2  || numPostedMonth === numCurrMonth + 2) {
                 timePosted = "10 months ago";
-            } else if (numPostedMonth === numCurrMonth + 3 ) {
+            } else if (numPostedMonth === numCurrMonth - 3  || numPostedMonth === numCurrMonth + 3) {
                 timePosted = "9 months ago";
-            } else if (numPostedMonth === numCurrMonth + 4 ) {
+            } else if (numPostedMonth === numCurrMonth - 4  || numPostedMonth === numCurrMonth + 4) {
                 timePosted = "8 months ago";
-            } else if (numPostedMonth === numCurrMonth + 5 ) {
+            } else if (numPostedMonth === numCurrMonth - 5  || numPostedMonth === numCurrMonth + 5) {
                 timePosted = "7 months ago";
-            } else if (numPostedMonth === numCurrMonth + 6 ) {
+            } else if (numPostedMonth === numCurrMonth - 6  || numPostedMonth === numCurrMonth + 6) {
                 timePosted = "6 months ago";
-            } else if (numPostedMonth === numCurrMonth + 7 ) {
+            } else if (numPostedMonth === numCurrMonth - 7  || numPostedMonth === numCurrMonth + 7) {
                 timePosted = "5 months ago";
-            } else if (numPostedMonth === numCurrMonth + 8 ) {
+            } else if (numPostedMonth === numCurrMonth - 8  || numPostedMonth === numCurrMonth + 8) {
                 timePosted = "4 months ago";
-            } else if (numPostedMonth === numCurrMonth + 9 ) {
+            } else if (numPostedMonth === numCurrMonth - 9  || numPostedMonth === numCurrMonth + 9) {
                 timePosted = "3 months ago";
-            } else if (numPostedMonth === numCurrMonth + 10 ) {
+            } else if (numPostedMonth === numCurrMonth - 10 || numPostedMonth === numCurrMonth + 10 ) {
                 timePosted = "2 months ago";
-            } else if (numPostedMonth === numCurrMonth + 11 ) {
+            } else if (numPostedMonth === numCurrMonth - 11 || numPostedMonth === numCurrMonth + 11) {
                 timePosted = "1 month ago";
             }
         } else if (numPostedYear + 2 <= numCurrYear) {
             timePosted = "over 2 years ago"
         }
         
-
-
     return (
         <> {timePosted}</>
     )

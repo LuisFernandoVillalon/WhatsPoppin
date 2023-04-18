@@ -27,7 +27,7 @@ const About = () => {
                     <li>Bootstrap icons</li>
                     <li>Firebase:
                         <ul>
-                            <li>Realtime Database</li>
+                            <li>Firestore Database</li>
                             <li>Authentication</li>
                         </ul>
                     </li>

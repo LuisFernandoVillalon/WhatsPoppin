@@ -1,7 +1,7 @@
 import About from "./About";
 import HomeBoard from "./HomeBoard";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { getDownVoteList, getRecords, getUpVoteList } from '../MessageBoardSample/firebaseData';
+import { getRecords } from '../MessageBoardSample/firebaseData';
 import { useState, useEffect } from "react";
 import Post from './Post';
 import "../styles.css";
@@ -25,18 +25,11 @@ const Content = () => {
     const [logInState, setLogInState] = useState(temp);
     const [entryMB, setEntryMB] = useState([]);
     const [currentUserUID, setCurrentUserUID] = useState("");
-    const [upVoteList, setUpVoteList] = useState("");
-    const [downVoteList, setDownVoteList] = useState("");
-
-    // const [postVoteAmount, setPostVoteAmount] = useState(0);
-    // const [downVoteStatus, setDownVoteStatus] = useState(false);
-    // const [upVoteStatus, setUpVoteStatus] = useState(false);
+    const [voteList, setVoteList] = useState("");
 
 
     useEffect(() => {
-        getRecords({ setMasterBoard, setEntryMB });
-        getUpVoteList({setUpVoteList});
-        getDownVoteList({setDownVoteList});
+        getRecords({ setMasterBoard, setEntryMB, setVoteList});
         setCurrentUserUID(localStorage.getItem("currentUserUID"));
     }, []);
 
@@ -50,6 +43,9 @@ const Content = () => {
                     searchInput={searchInput}
                     setSearchInput={setSearchInput}
                     masterBoard={masterBoard}
+                    setMasterBoard={setMasterBoard}
+                    voteList={voteList}
+                    setVoteList={setVoteList}
                     searchResult={searchResult}
                     setSearchResult={setSearchResult}
                     setCurrentPost={setCurrentPost}
@@ -80,17 +76,10 @@ const Content = () => {
                                                 setEntryMB={setEntryMB}
                                                 currentUserUID={currentUserUID}
                                                 setCurrentUserUID={setCurrentUserUID}
-                                                upVoteList={upVoteList}
-                                                setUpVoteList={setUpVoteList}
-                                                downVoteList={downVoteList}
-                                                setDownVoteList={setDownVoteList}
-
-                                                // postVoteAmount={postVoteAmount}
-                                                // setPostVoteAmount={setPostVoteAmount}
-                                                // downVoteStatus={downVoteStatus}
-                                                // setDownVoteStatus={setDownVoteStatus}
-                                                // upVoteStatus={upVoteStatus}
-                                                // setUpVoteStatus={setUpVoteStatus}
+                                                voteList={voteList}
+                                                setVoteList={setVoteList}
+                                                // downVoteList={downVoteList}
+                                                // setDownVoteList={setDownVoteList}
                                             />}
                     />
                     <Route path="/post" element={<Post 
@@ -103,12 +92,16 @@ const Content = () => {
                                                     logInState={logInState}
                                                     currentUserUID={currentUserUID}
                                                     entryMB={entryMB}
-                                                    upVoteList={upVoteList}
-                                                    downVoteList={downVoteList}
+                                                    voteList={voteList}
+                                                    setVoteList={setVoteList}
+                                                    // upVoteList={upVoteList}
+                                                    // downVoteList={downVoteList}
                                                 />}
                     />
                     <Route path="/create-post" element={<CreatePost 
-                                                            currentUserUID={currentUserUID}
+                                                            setMasterBoard={setMasterBoard}
+                                                            setEntryMB={setEntryMB}
+                                                            setVoteList={setVoteList}
                                                         />}
                     />
                 </Routes>

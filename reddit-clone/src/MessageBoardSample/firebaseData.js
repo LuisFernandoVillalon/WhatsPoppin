@@ -1,6 +1,9 @@
 import { initializeApp } from 'firebase/app';
-import { getDatabase, ref, onValue, child, push, update } from "firebase/database"; 
+// import { getDatabase, ref, onValue, child, push, update } from "firebase/database"; 
+import  sampleBoard  from "./MessageBoardSample.json";
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, updateProfile  } from "firebase/auth";
+import { getFirestore, doc, setDoc, Timestamp, getDoc, updateDoc } from "firebase/firestore";
+import uniqid from 'uniqid';
 
 const firebaseConfig = {
     apiKey: "AIzaSyCkY2NbgewS8OFKnSRv5tKfMgWwTpzoKTM",
@@ -12,7 +15,7 @@ const firebaseConfig = {
 };
 const app = initializeApp(firebaseConfig);
 
-const database = getDatabase(app);
+const db = getFirestore(app);
 
 const auth = getAuth(app);
 
@@ -33,207 +36,376 @@ export async function logInUser(email, password) {
   const user = userCredential.user;
   return user;
 }
+export async function addPostToDataBase(user, type, timePosted, voteAmount, title, content, comments, { setMasterBoard, setEntryMB }) {
 
-export function addPostToDataBase(user, type, timePosted, voteAmount, title, content, comments) {
-    const newUserKey = push(child(ref(database), 'post')).key;
-    
-    const updates = {};
+  const docRef = doc(db, "data", "board");
+  const docSnap = await getDoc(docRef);
+  let temp = "";
+  if (docSnap.exists()) {
+        temp = docSnap.data();
+  } else {
+  // docSnap.data() will be undefined in this case
+    console.log("No such document!");
+  }
+  temp.sampleBoard = Object.entries(temp.sampleBoard);
+  temp.sampleBoard.push([temp.sampleBoard.length.toString(), {
+    user: user, 
+    id: uniqid(),
+    type: type, 
+    timePosted: timePosted, 
+    voteAmount: voteAmount, 
+    title: title, 
+    content: content, 
+    comments: comments
+  }]);
+  temp.sampleBoard = temp.sampleBoard.reduce((accum, [k, v]) => {
+    accum[k] = v;
+    return accum;
+  }, {})
 
-    updates[newUserKey] = {user, type, timePosted, voteAmount, title, content, comments, newUserKey};
-
-    return update(ref(database), updates);
+  await setDoc(doc(db, "data", "board"), temp);
+  getRecords({ setMasterBoard, setEntryMB });
 }
-
-export function getRecords({ setMasterBoard, setEntryMB }) { 
-  const board = ref(database, '/');
-  onValue(board, (snapshot) => {
-    const data = snapshot.val();
-   setMasterBoard(data);
-   setEntryMB(data);
-  });
-}
-
-export function getUpVoteList({setUpVoteList}) {
-  const upVoteList = ref(database, '/' );
-  onValue(upVoteList, (snapshot) => {
-    let data = snapshot.child("upVoteList").val();
-    if (data === null) {
-      data = [""];
+export async function upVotePostFirebase(postVoteAmount, props){
+  const boardRef = doc(db, "data", "board");
+  const boardSnap = await getDoc(boardRef);
+  const currentUser = props.props.props.currentUserUID;
+  const currentPostID = props.currentPost.id;
+  const mb = props.props.props.masterBoard;
+  const temp = Object.entries(mb);
+  
+  temp.map((post) => {
+    if (post[1].id === currentPostID) {
+      post[1].voteAmount = postVoteAmount;
     }
-    setUpVoteList(data);
-  });
-}
+  })
 
-export function getDownVoteList({setDownVoteList}) {
-  const downVoteList = ref(database, '/' );
-  onValue(downVoteList, (snapshot) => {
-    let data = snapshot.child("downVoteList").val();
-    if (data === null) {
-      data = [""];
-    }
-    setDownVoteList(data);
-  });
-}
 
-export function upVotePostFirebase(postVoteAmount, props){
-     let board = props.props.props.entryMB;
-     let currPost = props.currentPost;
-    board = Object.entries(board);
-    let keyLocation = '';
-    for (let i = 0; i < board.length; ++i) {
-      if (board[i][1].user === currPost.user) {
-        if (board[i][1].timePosted === currPost.timePosted) {
-          if (board[i][1].title === currPost.title) {
-            if (board[i][1].type === currPost.type) {
-              if (board[i][1].content === currPost.content) {
-                    keyLocation = board[i][0];
-              }
-            }
-          }
+   if (boardSnap.exists()) {
+         let board = boardSnap.data();
+         let upVoteList = board.voteList;
+         let tempUserArray = [];
+         if (!Array.isArray(upVoteList)) {
+          upVoteList = board.voteList.users;
+         }
+         for (let i = 0; i < upVoteList.length; ++i) {
+            tempUserArray.push(upVoteList[i].currentUser);
+         }
+         if (upVoteList.length === 0 || !tempUserArray.includes(currentUser)) {
+          upVoteList.push({currentUser, post: [
+                                                {currentPostID, upVoteState: true, downVoteState: false}
+                                              ]
+                          }
+                        );
+         } else {
+          upVoteList.map((user) => {
+              if (user.currentUser === currentUser) {
+                let tempPostArray = [];
+                for (let i = 0; i < user.post.length; ++i) {
+                   tempPostArray.push(user.post[i].currentPostID);
+                }
+                  if (!tempPostArray.includes(currentPostID)) {
+                    user.post.push({currentPostID, upVoteState: true, downVoteState: false})
+                  } else {
+                    user.post.map((item => {
+                        if (item.currentPostID === currentPostID) {
+                          item.upVoteState = true;
+                          item.downVoteState = false;
+                        }
+                    }))
+                  }
+              } 
+          })
         }
-      }
+        const output = Object.fromEntries(temp);
+        board.sampleBoard = output;
+        board.voteList = upVoteList;
+        props.props.props.setVoteList(board.voteList);
+        props.props.props.setMasterBoard(board.sampleBoard);
+          await setDoc(doc(db, "data", "board"), board);
+        }
+     
+}
+export async function downVotePostFirebase(postVoteAmount, props){
+  const boardRef = doc(db, "data", "board");
+  const boardSnap = await getDoc(boardRef);
+  const currentUser = props.props.props.currentUserUID;
+  const currentPostID = props.currentPost.id;
+  const mb = props.props.props.masterBoard;
+  const temp = Object.entries(mb);
+  
+  temp.map((post) => {
+    if (post[1].id === currentPostID) {
+      post[1].voteAmount = postVoteAmount;
     }
-    const updates = {};
-        const comments =  currPost.comments;
-        const content =  currPost.content;
-        const timePosted =  currPost.timePosted;
-        const title =  currPost.title;
-        const type =  currPost.type;
-        const user =  currPost.user;
-        const newUserKey = currPost.newUserKey;
-        const voteAmount = postVoteAmount ;
-    updates[keyLocation] = {comments, content, timePosted, title, type, user, voteAmount, newUserKey};
+  })
 
-    let uid = props.props.props.currentUserUID; 
-    const upVoteState = true;
-    const downVoteState = false;
-    if (typeof uid !== "string") {
-      uid = uid.uid;
+
+   if (boardSnap.exists()) {
+         let board = boardSnap.data();
+         let downVoteList = board.voteList;
+         let tempUserArray = [];
+         if (!Array.isArray(downVoteList)) {
+          downVoteList = board.voteList.users;
+         }
+         for (let i = 0; i < downVoteList.length; ++i) {
+            tempUserArray.push(downVoteList[i].currentUser);
+         }
+         
+         if (downVoteList.length === 0 || !tempUserArray.includes(currentUser)) {
+     
+          downVoteList.push({currentUser, post: [
+                                                {currentPostID, upVoteState: false, downVoteState: true}
+                                              ]
+                          }
+                        );
+         } else {
+          
+          downVoteList.map((user) => {
+              if (user.currentUser === currentUser) {
+               
+                let tempPostArray = [];
+                for (let i = 0; i < user.post.length; ++i) {
+                   tempPostArray.push(user.post[i].currentPostID);
+                }
+                  if (!tempPostArray.includes(currentPostID)) {
+                  
+                    user.post.push({currentPostID, upVoteState: false, downVoteState: true})
+                  } else {
+                    user.post.map((item => {
+                        if (item.currentPostID === currentPostID) {
+                          item.upVoteState = false;
+                          item.downVoteState = true;
+                        }
+                    }))
+                  }
+              } 
+          })
+        }
+        const output = Object.fromEntries(temp);
+        board.sampleBoard = output;
+        board.voteList = downVoteList;
+        props.props.props.setVoteList(board.voteList);
+        props.props.props.setMasterBoard(board.sampleBoard);
+          await setDoc(doc(db, "data", "board"), board);
+        }
+     
+}
+export async function downVoteIndividualPostFirebase(postVoteAmount, props) {
+  const docRef = doc(db, "data", "board");
+  const docSnap = await getDoc(docRef);
+  const currentUser = props.currentUserUID;
+  const currentPostID = props.currentPost.id
+  const mb = props.masterBoard;
+  const temp = Object.entries(mb);
+    
+  temp.map((post) => {
+    if (post[1].id === currentPostID) {
+      post[1].voteAmount = postVoteAmount;
     }
-    updates['/downVoteList/' + uid + '/' + keyLocation] = { downVoteState };
-    updates['/upVoteList/' + uid + '/' + keyLocation] = { upVoteState };
-    return update(ref(database), updates);
-}
+  })
 
-export function upVoteIndividualPostFirebase(postVoteAmount, props) {
-  let board = props.entryMB;
-  let currPost = props.currentPost;
- board = Object.entries(board);
- let keyLocation = '';
- for (let i = 0; i < board.length; ++i) {
-   if (board[i][1].user === currPost.user) {
-     if (board[i][1].timePosted === currPost.timePosted) {
-       if (board[i][1].title === currPost.title) {
-         if (board[i][1].type === currPost.type) {
-           if (board[i][1].content === currPost.content) {
-                 keyLocation = board[i][0];
-           }
-         }
-       }
-     }
+   let board = docSnap.data();
+   let downVoteList = board.voteList;
+   let tempUserArray = [];
+   if (!Array.isArray(downVoteList)) {
+    downVoteList = board.voteList.users;
    }
- }
- const updates = {};
-     const comments =  currPost.comments;
-     const content =  currPost.content;
-     const timePosted =  currPost.timePosted;
-     const title =  currPost.title;
-     const type =  currPost.type;
-     const user =  currPost.user;
-     const newUserKey = currPost.newUserKey;
-     const voteAmount = postVoteAmount ;
- updates[keyLocation] = {comments, content, timePosted, title, type, user, voteAmount, newUserKey};
+   for (let i = 0; i < downVoteList.length; ++i) {
+     tempUserArray.push(downVoteList[i].currentUser);
+   }
+   if (downVoteList.length === 0 || !tempUserArray.includes(currentUser)) {     
+        downVoteList.push({currentUser, post: [
+                                          {currentPostID, upVoteState: false, downVoteState: true}
+                                        ]
+                          }
+                        );
+    } else {
+          
+     downVoteList.map((user) => {
+         if (user.currentUser === currentUser) {
+         
+           let tempPostArray = [];
+           for (let i = 0; i < user.post.length; ++i) {
+              tempPostArray.push(user.post[i].currentPostID);
+           }
+             if (!tempPostArray.includes(currentPostID)) {
+            
+               user.post.push({currentPostID, upVoteState: false, downVoteState: true})
+             } else {
+              
+               user.post.map((item => {
+                   if (item.currentPostID === currentPostID) {
+                     item.upVoteState = false;
+                     item.downVoteState = true;
+                   }
+               }))
+             }
+         } 
+     })
+   }
+   const output = Object.fromEntries(temp);
+   board.sampleBoard = output;
+   board.voteList = downVoteList;
+   props.setVoteList(board.voteList);
+   props.setMasterBoard(board.sampleBoard);
+   await setDoc(doc(db, "data", "board"), board)
+}
+export async function upVoteIndividualPostFirebase(postVoteAmount, props) {
+  const docRef = doc(db, "data", "board");
+  const docSnap = await getDoc(docRef);
+  const currentUser = props.currentUserUID;
+  const currentPostID = props.currentPost.id
+  const mb = props.masterBoard;
+  const temp = Object.entries(mb);
+    
+  temp.map((post) => {
+    if (post[1].id === currentPostID) {
+      post[1].voteAmount = postVoteAmount;
+    }
+  })
 
- let uid = props.currentUserUID; 
- const upVoteState = true;
- const downVoteState = false;
- if (typeof uid !== "string") {
-   uid = uid.uid;
- }
- updates['/downVoteList/' + uid + '/' + keyLocation] = { downVoteState };
- updates['/upVoteList/' + uid + '/' + keyLocation] = { upVoteState };
- return update(ref(database), updates);
+   let board = docSnap.data();
+   let upVoteList = board.voteList;
+   let tempUserArray = [];
+   if (!Array.isArray(upVoteList)) {
+    upVoteList = board.voteList.users;
+   }
+   for (let i = 0; i < upVoteList.length; ++i) {
+     tempUserArray.push(upVoteList[i].currentUser);
+   }
+   if (upVoteList.length === 0 || !tempUserArray.includes(currentUser)) {     
+        upVoteList.push({currentUser, post: [
+                                          {currentPostID, downVoteState: false, upVoteState: true}
+                                        ]
+                          }
+                        );
+    } else {
+          
+     upVoteList.map((user) => {
+         if (user.currentUser === currentUser) {
+         
+           let tempPostArray = [];
+           for (let i = 0; i < user.post.length; ++i) {
+              tempPostArray.push(user.post[i].currentPostID);
+           }
+             if (!tempPostArray.includes(currentPostID)) {
+            
+               user.post.push({currentPostID, upVoteState: true, downVoteState: false})
+             } else {
+              
+               user.post.map((item => {
+                   if (item.currentPostID === currentPostID) {
+                     item.upVoteState = true;
+                     item.downVoteState = false;
+                   }
+               }))
+             }
+         } 
+     })
+   }
+   const output = Object.fromEntries(temp);
+   board.sampleBoard = output;
+   board.voteList = upVoteList;
+   props.setVoteList(board.voteList);
+   props.setMasterBoard(board.sampleBoard);
+   await setDoc(doc(db, "data", "board"), board)
+}
+export async function addCommentToFirebase(user, id, timePost, voteAmount, text, comments, currentPost, setMasterBoard, setVoteList) {
+  const docRef = doc(db, "data", "board");
+  const docSnap = await getDoc(docRef);
+  let temp = docSnap.data();
+  let sbArrayEntry = Object.entries(temp.sampleBoard);
+  sbArrayEntry.map((post) => {
+    if (post[1].id === currentPost.id) {
+      post[1].comments.push({
+        user: user,
+        id: id,
+        timePost: timePost, 
+        voteAmount: voteAmount, 
+        text: text,
+        comments: comments
+      })
+    }
+  })
+  
+  temp.sampleBoard = Object.fromEntries(sbArrayEntry);
+  setMasterBoard(temp.sampleBoard);
+  
+  await setDoc(doc(db, "data", "board"), temp);
 
 }
+export async function addReplyToFirebase(user, id, timePost, voteAmount, text, response, currentPost, setMasterBoard, setVoteList) {
+  const docRef = doc(db, "data", "board");
+  const docSnap = await getDoc(docRef);
+  let board = docSnap.data();
 
-export function downVotePostFirebase(postVoteAmount, props){
-  let board = props.props.props.entryMB;
-  let currPost = props.currentPost;
- board = Object.entries(board);
- let keyLocation = '';
- for (let i = 0; i < board.length; ++i) {
-   if (board[i][1].user === currPost.user) {
-     if (board[i][1].timePosted === currPost.timePosted) {
-       if (board[i][1].title === currPost.title) {
-         if (board[i][1].type === currPost.type) {
-           if (board[i][1].content === currPost.content) {
-                 keyLocation = board[i][0];
-           }
-         }
-       }
-     }
-   }
- }
- const updates = {};
-     const comments =  currPost.comments;
-     const content =  currPost.content;
-     const timePosted =  currPost.timePosted;
-     const title =  currPost.title;
-     const type =  currPost.type;
-     const user =  currPost.user;
-     const newUserKey = currPost.newUserKey;
-     const voteAmount = postVoteAmount ;
- updates[keyLocation] = {comments, content, timePosted, title, type, user, voteAmount, newUserKey};
+  let data = board.sampleBoard;
 
- let uid = props.props.props.currentUserUID; 
- const downVoteState = true;
- const upVoteState = false;
- if (typeof uid !== "string") {
-   uid = uid.uid;
- }
- updates['/downVoteList/' + uid + '/' + keyLocation] = { downVoteState };
- updates['/upVoteList/' + uid + '/' + keyLocation] = { upVoteState };
+  data = tempFunction(user, id, timePost, voteAmount, text, response, currentPost, data);
+  data = Object.fromEntries(data);
+  board.sampleBoard = data;
 
- return update(ref(database), updates);
+  setMasterBoard(data);
+  await setDoc(doc(db, "data", "board"), board);
+
 }
+function tempFunction(user, id, timePost, voteAmount, text, response, currentPost, data)  {
+            data = Object.entries(data);
+            data.map((post) => {
+              if (currentPost.id === post[1].id) {
+                for (let i = 0; i < post[1].comments.length; ++i) {
+                   if (post[1].comments[i].id === response.id) {
+                    let empty = [];
+                    post[1].comments[i].comments.push({
+                            user: user,
+                            id: id,
+                            timePost: timePost, 
+                            voteAmount: voteAmount, 
+                            text: text,
+                            comments: empty
+                          })
+                          return;
+                   }
+                }
+                        const temp = post[1].comments;
+                        retriveParentComment(response, temp, user, id, timePost, voteAmount, text);
+              }
+            })
+            return data;
+  }
+function retriveParentComment (response, temp, user, id, timePost, voteAmount, text) {
 
-export function downVoteIndividualPostFirebase(postVoteAmount, props) {
-  let board = props.entryMB;
-  let currPost = props.currentPost;
- board = Object.entries(board);
- let keyLocation = '';
- for (let i = 0; i < board.length; ++i) {
-   if (board[i][1].user === currPost.user) {
-     if (board[i][1].timePosted === currPost.timePosted) {
-       if (board[i][1].title === currPost.title) {
-         if (board[i][1].type === currPost.type) {
-           if (board[i][1].content === currPost.content) {
-                 keyLocation = board[i][0];
-           }
-         }
-       }
-     }
-   }
+  for (let i = 0; i < temp.length; ++i) {
+    if (temp[i].id === response.id) {
+      let empty = [];
+        temp[i].comments.push({
+          user: user,
+          id: id,
+          timePost: timePost, 
+          voteAmount: voteAmount, 
+          text: text,
+          comments: empty
+        })
+    }
+  }
+  for (let i = 0; i < temp.length; ++i) {
+    retriveParentComment(response, temp[i].comments, user, id , timePost, voteAmount, text)
+  }
  }
- const updates = {};
-     const comments =  currPost.comments;
-     const content =  currPost.content;
-     const timePosted =  currPost.timePosted;
-     const title =  currPost.title;
-     const type =  currPost.type;
-     const user =  currPost.user;
-     const newUserKey = currPost.newUserKey;
-     const voteAmount = postVoteAmount ;
- updates[keyLocation] = {comments, content, timePosted, title, type, user, voteAmount, newUserKey};
+export async function getRecords({ setMasterBoard, setEntryMB, setVoteList}) { 
 
- let uid = props.currentUserUID; 
- const upVoteState = false;
- const downVoteState = true;
- if (typeof uid !== "string") {
-   uid = uid.uid;
- }
- updates['/downVoteList/' + uid + '/' + keyLocation] = { downVoteState };
- updates['/upVoteList/' + uid + '/' + keyLocation] = { upVoteState };
- return update(ref(database), updates);
+  const docRef = doc(db, "data", "board");
+  const docSnap = await getDoc(docRef);
+
+  if (docSnap.exists()) {
+        setMasterBoard(docSnap.data().sampleBoard);
+        setEntryMB(docSnap.data());
+        setVoteList(docSnap.data().voteList)
+  } else {
+  // docSnap.data() will be undefined in this case
+    console.log("No such document!");
+    await setDoc(doc(db, "data", "board"), sampleBoard);
+  }
 
 }

@@ -302,6 +302,7 @@ a {
     color: rgb(1, 120, 210);
     background-color: lightgray;
     border-radius: 5px;
+    cursor: pointer;
 }
 .post-user {
     font-size: 0.75rem;
@@ -424,6 +425,28 @@ a {
     border-width: 5px; 
     color: white;
     font-size: 1rem;
+    font-weight: bold;
+    padding: 1.5%;
+    border-radius: 25%;
+    cursor: pointer;
+}
+.post-reply-button {
+    background-color: rgb(1, 120, 210);
+    border-color: white;
+    border-width: 3px; 
+    color: white;
+    font-size: 0.75rem;
+    font-weight: bold;
+    padding: 1.5%;
+    border-radius: 25%;
+    cursor: pointer;
+}
+.cancel-post-reply-button {
+    background-color: white;
+    border-color: rgb(1, 120, 210);
+    border-width: 3px; 
+    color: rgb(1, 120, 210);
+    font-size: 0.75rem;
     font-weight: bold;
     padding: 1.5%;
     border-radius: 25%;
@@ -577,6 +600,19 @@ a {
     width: 100%;
     margin-left: -15%;
 }
+.post-reply-container {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    margin-left: -15%;
+    margin-top: 5%;
+}
+.post-reply-container {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    margin-left: -15%;
+}
 .comment-label {
     font-size: 0.75rem;
     margin-bottom: 1.5%;
@@ -597,6 +633,7 @@ a {
     padding: 2.5%;
     font-family: Verdana, Geneva, Tahoma, sans-serif;
     resize: none;
+    overflow:hidden
 }
 textarea:focus {
     outline: none;
@@ -606,4 +643,9 @@ textarea:focus {
     justify-content: flex-end;
     padding: 2%;
 }
-
+.post-reply-button-container {
+    display: flex;
+    justify-content: flex-end;
+    padding: 2%;
+    gap: 15px;
+}
