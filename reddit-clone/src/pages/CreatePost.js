@@ -1,7 +1,7 @@
 import { FileText, Link45deg, Image } from 'react-bootstrap-icons'; 
 import { useNavigate } from "react-router-dom";
 import { React, useState, useRef } from "react";
-import { addPostToDataBase } from '../MessageBoardSample/firebaseData';
+import { addPostToDataBase } from '../firebase-data/PostData';
 
 const CreatePost = ({ setMasterBoard, setEntryMB, setVoteList, currentUserUID }) => {
 

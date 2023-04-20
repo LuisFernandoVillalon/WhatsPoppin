@@ -3,7 +3,7 @@ import "../styles.css";
 import { Search, PersonCircle, PersonFill, PencilSquare, BoxArrowLeft } from 'react-bootstrap-icons'; 
 import { useNavigate } from "react-router-dom";
 import { React, useState } from "react";
-import useScrollBlock from "./useScrollBlock";
+import useScrollBlock from "../utilities/useScrollBlock";
 import SignUpForm from "./SignUpForm";
 import LogInForm from "./LogInForm";
 
@@ -28,11 +28,7 @@ const Header = (props) => {
         return props.setSearchResult([]);
        }
        let temp = "";
-    //    if (props.masterBoard.sampleBoard) {
-    //     temp = props.masterBoard.sampleBoard
-    // } else {
         temp = props.masterBoard;
-    // }
        if (!Array.isArray(temp)) {
         
             temp = Object.entries(temp).filter((data) => {

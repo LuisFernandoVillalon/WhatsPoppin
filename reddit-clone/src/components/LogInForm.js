@@ -1,7 +1,7 @@
 import logo from "../assets/NEWS.png";
 import { X } from  'react-bootstrap-icons'; 
 import { useRef } from 'react';
-import { logInUser } from "../MessageBoardSample/firebaseData";
+import { logInUser } from "../firebase-data/StartUpData";
 
 const LogInForm = (props) => {
     props.blockScroll();

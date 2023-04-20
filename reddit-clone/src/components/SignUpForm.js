@@ -1,6 +1,6 @@
 import logo from "../assets/NEWS.png";
 import { X } from  'react-bootstrap-icons'; 
-import { addNewUser } from "../MessageBoardSample/firebaseData";
+import { addNewUser } from "../firebase-data/StartUpData";
 import { useRef } from 'react';
 
 const SignUpForm = (props) => {

@@ -1,11 +1,9 @@
 import React from 'react';
-// import Header from "../components/Header";
-import Content from "../components/Content";
+import Content from "./Content";
 
 const MessageBoard = () => {
     return (
         <>
-            {/* <Header /> */}
             <Content />
         </>
     )

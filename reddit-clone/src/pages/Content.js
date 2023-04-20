@@ -1,11 +1,11 @@
-import About from "./About";
+import About from "../components/About";
 import HomeBoard from "./HomeBoard";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { getRecords } from '../MessageBoardSample/firebaseData';
+import { getRecords } from '../firebase-data/StartUpData';
 import { useState, useEffect } from "react";
 import Post from './Post';
 import "../styles.css";
-import Header from "./Header";
+import Header from "../components/Header";
 import CreatePost from "./CreatePost";
 
 const Content = () => {
