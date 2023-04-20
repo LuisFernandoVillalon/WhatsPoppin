@@ -197,7 +197,7 @@ const ImagePost = ({props}) => {
                 } 
             }
         })
-    }, []);
+    }, [upVoteStatus, downVoteStatus]);
 
     return (
         <div className="individual-post" onClick={() => postRoute(props)}>
@@ -258,7 +258,7 @@ const LinkPost = ({props}) => {
                 } 
             }
         })
-    }, []);
+    }, [upVoteStatus, downVoteStatus]);
 
      let temp = props.currentPost.title;
      let tempLink = props.currentPost.content;

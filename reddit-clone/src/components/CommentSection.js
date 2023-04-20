@@ -1,10 +1,20 @@
 import { CaretUpFill, CaretDownFill, ChatSquareFill } from "react-bootstrap-icons"; 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import uniqid from 'uniqid';
-import { addReplyToFirebase } from "../MessageBoardSample/firebaseData";
+import { addReplyToFirebase, upVoteCommentFirebase, downVoteCommentFirebase, deleteCommentFromFirebase } from "../MessageBoardSample/firebaseData";
 
 const CommentSection = ({
-    currentPost, masterBoard, setCurrentPost, setLogIn, setMasterBoard, setSignUp, logInState, setVoteList
+    currentPost, 
+    masterBoard, 
+    setCurrentPost, 
+    setLogIn, 
+    setMasterBoard, 
+    setSignUp, 
+    logInState, 
+    setVoteList, 
+    currentUserUID, 
+    entryMB,
+    voteList
 }) => {
 
     if (masterBoard.sampleBoard) {
@@ -45,10 +55,17 @@ const CommentSection = ({
                 masterBoard={masterBoard}
                 setMasterBoard={setMasterBoard}
                 setVoteList={setVoteList}
+                currentUserUID={currentUserUID}
+                entryMB={entryMB}
+                voteList={voteList}
+                setCurrentPost={setCurrentPost}
                 key={uniqid()}
             />
         ))
     }
+
+
+
     return (
         <div className="comment-section-container">
             <div className="sortby-comments-container">
@@ -67,13 +84,51 @@ const CommentSection = ({
 const signUp = ({setSignUp}) => {
     setSignUp(true);
 }
-const DisplayComments = ({response, setSignUp, logInState, currentPost, masterBoard, setMasterBoard, setVoteList}) => {
+const upVoteComment = (commentVoteAmount, response, currentPost, currentUserUID, entryMB, masterBoard, setMasterBoard, voteList, setVoteList) => {
+    
+    const props = {response, currentPost, currentUserUID, entryMB, voteList, setVoteList, masterBoard, setMasterBoard};
+    upVoteCommentFirebase(commentVoteAmount + 1, props);
+}
+const downVoteComment = (commentVoteAmount, response, currentPost, currentUserUID, entryMB, masterBoard, setMasterBoard, voteList, setVoteList) => {
+    
+    const props = {response, currentPost, currentUserUID, entryMB, voteList, setVoteList, masterBoard, setMasterBoard};
+    downVoteCommentFirebase(commentVoteAmount - 1, props);
+}
+const DisplayComments = ({
+    response, 
+    setSignUp, 
+    logInState, 
+    currentPost, 
+    masterBoard, 
+    setMasterBoard, 
+    setVoteList, 
+    currentUserUID,
+    entryMB, 
+    voteList,
+    setCurrentPost
+}) => {
+
     let currentResponse = "";
     if (response !== undefined) {
         currentResponse = Object.entries(response.comments);
     }
      let responseStatus = "";
      let responseList = "";
+
+     const [commentVoteAmount, setCommentVoteAmount] = useState(response.voteAmount);
+     const [downVoteStatus, setDownVoteStatus] = useState(false);
+     const [upVoteStatus, setUpVoteStatus] = useState(false);
+     const [commentArray, setCommentArray] = useState([]);
+     const [dltBtnStatus, setDltBtnStatus] = useState(false);
+
+     const askUser = () => {
+        if (window.confirm("Are you sure you wish to delete this comment? Action is irreversible.")) {
+            deleteCommentFromFirebase(response, currentPost, setMasterBoard);
+
+          } else {
+            console.log("cancel")
+          }
+    }
     
      if (currentResponse === "") {
          responseStatus = false;
@@ -89,17 +144,62 @@ const DisplayComments = ({response, setSignUp, logInState, currentPost, masterBo
         
         currRespArr.push(currentResponse[i][1]);
      }
+
+     useEffect(() => {
+        if (currentUserUID.uid) {
+            currentUserUID = currentUserUID.uid;
+        }
+           
+            if (response.userID) {
+                if (response.userID === currentUserUID) {
+                    setDltBtnStatus(true);
+                }
+             else {
+                setDltBtnStatus(false);
+            }
+        }
+        setCommentVoteAmount(response.voteAmount);
+        for (let i = 0; i < voteList.length; ++i) {
+
+                if (voteList[i].currentUser === currentUserUID || voteList[i].currentUser === currentUserUID.uid) {
+                    
+                    if (!voteList[i].comments) {
+                        
+                        continue;
+                    } else {
+                    voteList[i].comments.map((comment) => {
+                        if (comment === undefined || comment === null) {
+                            return;
+                        } else {
+                            if (comment.currentResponseID === response.id) {
+                                
+                                setUpVoteStatus(comment.upVoteState);
+                                setDownVoteStatus(comment.downVoteState);
+                                return;
+                            }
+                        }
+                    })
+                }
+            }
+            
+        }
+        
+        
+     }, [upVoteStatus, downVoteStatus, response.voteAmount])
      
      responseList = currRespArr.map((response) => (
         <DisplayComments 
-             response={response}
-             setSignUp={setSignUp} 
-             logInState={logInState}
-             currentPost={currentPost}
-             masterBoard={masterBoard}
-             setMasterBoard={setMasterBoard}
-             setVoteList={setVoteList}
-             key={uniqid()}
+            response={response}
+            setSignUp={setSignUp} 
+            logInState={logInState}
+            currentPost={currentPost}
+            masterBoard={masterBoard}
+            setMasterBoard={setMasterBoard}
+            setVoteList={setVoteList}
+            currentUserUID={currentUserUID}
+            entryMB={entryMB}
+            voteList={voteList}
+            key={uniqid()}
         />
      )) 
     const [replyFormStatus, setReplyFormStatus] = useState(false);
@@ -122,7 +222,7 @@ const DisplayComments = ({response, setSignUp, logInState, currentPost, masterBo
         // let comments= [];
         const id = uniqid();
 
-        addReplyToFirebase(user, id, timePost, voteAmount, text, response, currentPost, setMasterBoard, setVoteList);
+        addReplyToFirebase(user, id, timePost, voteAmount, text, response, currentPost, setMasterBoard, setVoteList, currentUserUID);
 
         event.target.reset();
     }
@@ -131,18 +231,29 @@ const DisplayComments = ({response, setSignUp, logInState, currentPost, masterBo
     }
     return (
         <div className="individual-comment" >
-            <div className="first-column-comment">
-                <CaretUpFill className='nestedUpArrow' onClick={() => signUp({setSignUp})}/>
-                {response.voteAmount}
-                <CaretDownFill className='nestedDownArrow' onClick={() => signUp({setSignUp})}/>
-                <div className="comment-line"></div>
-            </div>
-            <div className="second-column-page">
-                <div className='post-user'>Posted by {response.user}<TimeCommentPosted response={response}/></div>
-                <div className='post-title'>{response.title}</div>
-                <div className="comment-text">{response.text}</div>
-                {!logInState && <div className='add-comment' onClick={() => signUp({setSignUp})}><ChatSquareFill /> Reply</div> }
-                {logInState && <div className='add-comment' onClick={() => displayReplyForm()}><ChatSquareFill /> Reply</div> }
+            {!logInState && <div className="first-column-comment">
+                                <CaretUpFill className='nestedUpArrow' onClick={() => signUp({setSignUp})}/>
+                                    {commentVoteAmount}
+                                <CaretDownFill className='nestedDownArrow' onClick={() => signUp({setSignUp})}/>
+                                <div className="comment-line"></div>
+                            </div>
+            }
+            {logInState && <div className="first-column-comment">
+                                {upVoteStatus ? <CaretUpFill className='upArrowActive'/> : <CaretUpFill  onClick={() => upVoteComment(commentVoteAmount, response, currentPost, currentUserUID, entryMB, masterBoard, setMasterBoard, voteList, setVoteList)} className='upArrow'/>}
+                                    {commentVoteAmount}
+                                {downVoteStatus ? <CaretDownFill className='downArrowActive'/> : <CaretDownFill onClick={() => downVoteComment(commentVoteAmount, response, currentPost, currentUserUID, entryMB, masterBoard, setMasterBoard, voteList, setVoteList)} className='downArrow'/>}
+                                <div className="comment-line"></div>
+                            </div>
+            }
+            <div className="second-column-comment">
+                    <div className='post-user'>Posted by {response.user}<TimeCommentPosted response={response}/></div>
+                    <div className='post-title'>{response.title}</div>
+                    <div className="comment-text">{response.text}</div>
+                    {!logInState && <div className='add-comment' onClick={() => signUp({setSignUp})}><ChatSquareFill /> Reply</div> }
+                    <div className="comment-dlt-btn-container">
+                        {logInState && <div className='add-comment' onClick={() => displayReplyForm()}><ChatSquareFill /> Reply</div> }
+                        {(logInState && dltBtnStatus) && <div onClick={() => askUser()} className='comment-user-dlt-btn'>Delete post</div>}
+                    </div>
                 {replyFormStatus && <div className='post-reply-container'>
                                         <form onSubmit={handleSubmit}>
                                             <div className='post-comment-input-container'>
@@ -153,7 +264,8 @@ const DisplayComments = ({response, setSignUp, logInState, currentPost, masterBo
                                                 </div>
                                             </div>
                                         </form>
-                                    </div>}
+                                    </div>
+                }
                 {responseStatus && <div className="individual-response">{responseList}</div> }
             </div>
         </div>

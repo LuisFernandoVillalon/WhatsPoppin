@@ -102,6 +102,7 @@ const Content = () => {
                                                             setMasterBoard={setMasterBoard}
                                                             setEntryMB={setEntryMB}
                                                             setVoteList={setVoteList}
+                                                            currentUserUID={currentUserUID}
                                                         />}
                     />
                 </Routes>

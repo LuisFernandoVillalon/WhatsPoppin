@@ -2,7 +2,7 @@ import { CaretUpFill, CaretDownFill, ChatSquare, BoxArrowUpRight } from 'react-b
 import  CommentSection  from "./CommentSection";
 import uniqid from 'uniqid';
 import { useState, useEffect, useRef } from "react";
-import { downVoteIndividualPostFirebase, upVoteIndividualPostFirebase, addCommentToFirebase } from '../MessageBoardSample/firebaseData';
+import { downVoteIndividualPostFirebase, upVoteIndividualPostFirebase, addCommentToFirebase, deletePostFromFirebase } from '../MessageBoardSample/firebaseData';
 
 const Post = ({masterBoard,
     setMasterBoard,
@@ -115,12 +115,33 @@ const TextPostPage = ({
     const [downVoteStatus, setDownVoteStatus] = useState(false);
     const [upVoteStatus, setUpVoteStatus] = useState(false);
     const [commentArray, setCommentArray] = useState([]);
+    const [dltBtnStatus, setDltBtnStatus] = useState(false);
 
     const commentRef = useRef(undefined);
 
-     useEffect(() => {
 
-        setPostVoteAmount(currentPost.voteAmount);
+     useEffect(() => {
+        let temp = Object.entries(masterBoard);
+        if (currentUserUID.uid) {
+            currentUserUID = currentUserUID.uid;
+        }
+           
+            if (currentPost.userID) {
+                if (currentPost.userID === currentUserUID) {
+                    setDltBtnStatus(true);
+                }
+             else {
+                setDltBtnStatus(false);
+            }
+        }
+
+        temp.map((post) => {
+            if (post[1].id === currentPost.id) {
+                setPostVoteAmount(post[1].voteAmount);
+            }
+        })
+        temp = Object.fromEntries(temp);
+        // setPostVoteAmount(currentPost.voteAmount);
         let voteListArray = Object.entries(voteList);
         voteListArray.map((user) => {
             if (user[1].currentUser === currentUserUID.uid || user[1].currentUser === currentUserUID) {
@@ -137,7 +158,7 @@ const TextPostPage = ({
                 }  
             }
         })
-     }, [upVoteStatus, downVoteStatus]);
+     }, [upVoteStatus, downVoteStatus, currentPost.voteAmount]);
 
     const handleSubmit = (event) => {
         event.preventDefault();
@@ -153,11 +174,19 @@ const TextPostPage = ({
         let voteAmount = 1; 
         let comments= [];
 
-       addCommentToFirebase(user, id, timePost, voteAmount, text, comments, currentPost, setMasterBoard, setVoteList);
+       addCommentToFirebase(user, id, timePost, voteAmount, text, comments, currentPost, setMasterBoard, setVoteList, currentUserUID);
 
         event.target.reset();
     }
-    
+
+    const askUser = () => {
+        if (window.confirm("Are you sure you wish to delete this post? Action is irreversible.")) {
+            deletePostFromFirebase(currentPost, setMasterBoard, setCurrentPost);
+
+          } else {
+            console.log("cancel")
+          }
+    }
     return (
      <div className="individual-post-page" >
         {!logInState && <div className="first-column">
@@ -173,11 +202,15 @@ const TextPostPage = ({
                         </div>
         }
         <div className="second-column-page">
-             <div className='post-user'>Posted by {currentPost.user}<TimeCommentPosted 
-                                                                        currentPost={currentPost}
-                                                                        key={uniqid()}
-                                                                    />
+            <div className='post-user-info-container'>
+                <div className='post-user'>Posted by {currentPost.user}<TimeCommentPosted 
+                                                                            currentPost={currentPost}
+                                                                            key={uniqid()}
+                                                                        />
+                </div>
+                {(logInState && dltBtnStatus) && <div onClick={() => askUser()} className='post-user-dlt-btn'>Delete post</div>}
              </div>
+
              <div className='post-title'>{currentPost.title}</div>
              <div className="post-text">{currentPost.content}</div>
              <div className='post-comments'><ChatSquare /> {commentAmount} Comments</div>
@@ -214,6 +247,9 @@ const TextPostPage = ({
                 commentArray={commentArray}
                 setCommentArray={setCommentArray}
                 setVoteList={setVoteList}
+                currentUserUID={currentUserUID}
+                entryMB={entryMB}
+                voteList={voteList}
                 key={uniqid()}
              />
         </div>
@@ -247,12 +283,30 @@ const ImagePostPage = ({
     const [downVoteStatus, setDownVoteStatus] = useState(false);
     const [upVoteStatus, setUpVoteStatus] = useState(false);
     const [commentArray, setCommentArray] = useState([]);
+    const [dltBtnStatus, setDltBtnStatus] = useState(false);
 
     const commentRef = useRef(undefined);
 
      useEffect(() => {
-
-        setPostVoteAmount(currentPost.voteAmount);
+        let temp = Object.entries(masterBoard);
+        if (currentUserUID.uid) {
+            currentUserUID = currentUserUID.uid;
+        }
+           
+            if (currentPost.userID) {
+                if (currentPost.userID === currentUserUID) {
+                    setDltBtnStatus(true);
+                }
+             else {
+                setDltBtnStatus(false);
+            }
+        }
+        temp.map((post) => {
+            if (post[1].id === currentPost.id) {
+                setPostVoteAmount(post[1].voteAmount);
+            }
+        })
+        temp = Object.fromEntries(temp);
         let voteListArray = Object.entries(voteList);
         voteListArray.map((user) => {
             if (user[1].currentUser === currentUserUID.uid || user[1].currentUser === currentUserUID) {
@@ -269,7 +323,7 @@ const ImagePostPage = ({
                 } 
             }
         })
-     }, [upVoteStatus, downVoteStatus]);
+     }, [upVoteStatus, downVoteStatus, currentPost.voteAmount]);
 
     const handleSubmit = (event) => {
         event.preventDefault();
@@ -285,11 +339,18 @@ const ImagePostPage = ({
         let voteAmount = 1; 
         let comments= [];
 
-       addCommentToFirebase(user, id, timePost, voteAmount, text, comments, currentPost, setMasterBoard);
+       addCommentToFirebase(user, id, timePost, voteAmount, text, comments, currentPost, setMasterBoard, setVoteList, currentUserUID);
 
         event.target.reset();
     }
+    const askUser = () => {
+        if (window.confirm("Are you sure you wish to delete this post? Action is irreversible.")) {
+            deletePostFromFirebase(currentPost, setMasterBoard, setCurrentPost);
 
+          } else {
+            console.log("cancel")
+          }
+    }
     return (
         <div className="individual-post-page">
         {!logInState && <div className="first-column">
@@ -305,7 +366,14 @@ const ImagePostPage = ({
                         </div>
         }
             <div className="second-column-page">
-                <div className='post-user'>Posted by {currentPost.user}<TimeCommentPosted currentPost={currentPost} key={uniqid()}/></div>
+                <div className='post-user-info-container'>
+                    <div className='post-user'>Posted by {currentPost.user}<TimeCommentPosted 
+                                                                                currentPost={currentPost}
+                                                                                key={uniqid()}
+                                                                            />
+                    </div>
+                    {(logInState && dltBtnStatus) && <div onClick={() => askUser()} className='post-user-dlt-btn'>Delete post</div>}
+                </div>
                 <div className='post-title'>{currentPost.title}</div>
                 <img alt="post" src={currentPost.content} className="post-image"/>
                 <div className='post-comments'><ChatSquare key={uniqid()} /> {commentAmount} Comments</div>
@@ -342,6 +410,9 @@ const ImagePostPage = ({
                     commentArray={commentArray}
                     setCommentArray={setCommentArray}
                     setVoteList={setVoteList}
+                    currentUserUID={currentUserUID}
+                    entryMB={entryMB}
+                    voteList={voteList}
                     key={uniqid()}
                  />
             </div>
@@ -382,12 +453,31 @@ const LinkPostPage = ({
     const [downVoteStatus, setDownVoteStatus] = useState(false);
     const [upVoteStatus, setUpVoteStatus] = useState(false);
     const [commentArray, setCommentArray] = useState([]);
+    const [dltBtnStatus, setDltBtnStatus] = useState(false);
 
     const commentRef = useRef(undefined);
 
      useEffect(() => {
-
-        setPostVoteAmount(currentPost.voteAmount);
+        let temp = Object.entries(masterBoard);
+        if (currentUserUID.uid) {
+            currentUserUID = currentUserUID.uid;
+        }
+           
+            if (currentPost.userID) {
+                if (currentPost.userID === currentUserUID) {
+                    setDltBtnStatus(true);
+                }
+             else {
+                setDltBtnStatus(false);
+            }
+        }
+        temp.map((post) => {
+            if (post[1].id === currentPost.id) {
+                setPostVoteAmount(post[1].voteAmount);
+            }
+        })
+        temp = Object.fromEntries(temp);
+        // setPostVoteAmount(currentPost.voteAmount);
         let voteListArray = Object.entries(voteList);
         voteListArray.map((user) => {
             if (user[1].currentUser === currentUserUID.uid || user[1].currentUser === currentUserUID) {
@@ -404,7 +494,7 @@ const LinkPostPage = ({
                 }  
             }
         })
-     }, [upVoteStatus, downVoteStatus]);
+     }, [upVoteStatus, downVoteStatus, currentPost.voteAmount]);
 
     const handleSubmit = (event) => {
         event.preventDefault();
@@ -420,11 +510,18 @@ const LinkPostPage = ({
         let voteAmount = 1; 
         let comments= [];
 
-       addCommentToFirebase(user, id, timePost, voteAmount, text, comments, currentPost, setMasterBoard);
+       addCommentToFirebase(user, id, timePost, voteAmount, text, comments, currentPost, setMasterBoard, setVoteList, currentUserUID);
 
         event.target.reset();
     }
+    const askUser = () => {
+        if (window.confirm("Are you sure you wish to delete this post? Action is irreversible.")) {
+            deletePostFromFirebase(currentPost, setMasterBoard, setCurrentPost);
 
+          } else {
+            console.log("cancel")
+          }
+    }
     let tempLink = currentPost.content;
     let tempArrLink = tempLink.split('');
     let truncatedLink = [];
@@ -450,7 +547,14 @@ const LinkPostPage = ({
         }
            
            <div className="second-column-page">
-                   <div className='post-user'>Posted by {currentPost.user}<TimeCommentPosted currentPost={currentPost} key={uniqid()}/></div>
+                    <div className='post-user-info-container'>
+                        <div className='post-user'>Posted by {currentPost.user}<TimeCommentPosted 
+                                                                                    currentPost={currentPost}
+                                                                                    key={uniqid()}
+                                                                                />
+                        </div>
+                        {(logInState && dltBtnStatus) && <div onClick={() => askUser()} className='post-user-dlt-btn'>Delete post</div>}
+                    </div>
                    <div className='post-title-link'>{currentPost.title}</div>
                    <a  rel="noreferrer" target="_blank" className='post-link-page' href={currentPost.content}>{truncatedLink}<BoxArrowUpRight/></a>
                    <div className='post-comments'><ChatSquare /> {commentAmount} Comments</div>
@@ -487,6 +591,9 @@ const LinkPostPage = ({
                         commentArray={commentArray}
                         setCommentArray={setCommentArray}
                         setVoteList={setVoteList}
+                        currentUserUID={currentUserUID}
+                        entryMB={entryMB}
+                        voteList={voteList}
                         key={uniqid()}
                     />
             </div>
@@ -551,8 +658,6 @@ const TimeCommentPosted = ({currentPost}) => {
     let numPostedYear = Number(tempPostedYear);
     let getMonth = numPostedMonth - numCurrMonth;
     getMonth = Math.abs(getMonth);
-    // console.log([{numCurrDay}, {numCurrMonth}, {numCurrYear}])
-    // console.log([{numPostedDay},{numPostedMonth},{numPostedYear}])
     if (numCurrYear === numPostedYear) {
         if (numCurrMonth === numPostedMonth) {
             if (numCurrDay === numPostedDay) {
