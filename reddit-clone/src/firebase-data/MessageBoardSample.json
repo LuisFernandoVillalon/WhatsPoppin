@@ -1,12 +1,12 @@
 {
     "sampleBoard": {
         "0": {
-            "user": "pokemonMaster",
-            "id": "weqrq",
+            "user": "da-OG",
+            "id": "21345f",
             "type": "text",
             "timePosted": "2020-03-12",
-            "voteAmount": 3,
-            "title": "Is Ash really the best to ever was?",
+            "voteAmount": 999,
+            "title": "Welcome to \"What's Poppin'?\"",
             "content": "Let me know what you think.",
             "comments": [
                 {
@@ -98,14 +98,91 @@
             "comments": []
         }, 
         "2": {
-            "user": "solecae29",
-            "id": "asd0f934",
-            "type": "link",
-            "timePosted": "2023-01-03",
-            "voteAmount": 7,
-            "title": "Cool game I found, it takes a while for the images to load lol",
-            "content": "https://luisfernandovillalon.github.io/photo-tagging-top/",
-            "comments": []
+            "user": "pokemonMaster",
+            "id": "weqrq",
+            "type": "text",
+            "timePosted": "2020-03-12",
+            "voteAmount": 3,
+            "title": "Is Ash really the best to ever was?",
+            "content": "Let me know what you think.",
+            "comments": [
+                {
+                    "user": "yosemite-77",
+                    "id": "2345",
+                    "timePost": "2023-03-15",
+                    "voteAmount": 9,
+                    "text": "In my humble opinion he truly is.",
+                    "comments": []
+                },
+                {
+                    "user": "typo-sion-CAH",
+                    "id": "09870",
+                    "timePost": "2020-05-15",
+                    "voteAmount": 11,
+                    "text": "I think he will alwaysbe known as the best to ever was.",
+                    "comments": [
+                        {
+                            "user": "pokeEnthus",
+                            "id": "asdfasdf",
+                            "timePost": "2020-05-25",
+                            "voteAmount": 4,
+                            "text": "bika bika if u know what i mean, Am i right?",
+                            "comments": [
+                                {
+                                    "user": "typo-sion-CAH",
+                                    "id": "0va09vp9r",
+                                    "timePost": "2021-05-09",
+                                    "voteAmount": 2,
+                                    "text": "big facts though",
+                                    "comments": [
+                                        {
+                                            "user": "pokeEnthus",
+                                            "id": "09w8fqe",
+                                            "timePost": "2022-04-19",
+                                            "voteAmount": 1,
+                                            "text": "all fax, no printers",
+                                            "comments": []
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "user": "digi-Tamer",
+                            "id": "sdfsdafe3",
+                            "timePost": "2020-05-25",
+                            "voteAmount": 1,
+                            "text": "im tearing up reading this :') ",
+                            "comments": []
+                        }
+                    ]
+                },
+                {
+                    "user": "MariahC.OO",
+                    "id": "asdf9222",
+                    "timePost": "2022-11-13",
+                    "voteAmount": -15,
+                    "text": "Does anyone know where the restrooms are?.",
+                    "comments": [
+                        {
+                            "user": "yosemite-77",
+                            "id": "ds89f0234f",
+                            "timePost": "2023-03-15",
+                            "voteAmount": 49,
+                            "text": "foh.",
+                            "comments": []
+                        },
+                        {
+                            "user": "imhere2LOL",
+                            "id": "0sd9fu",
+                            "timePost": "2023-03-20",
+                            "voteAmount": 0,
+                            "text": "lol",
+                            "comments": []
+                        }
+                    ]
+                }
+            ]
         },
         "3": {
             "user": "KoolKid-93",
