@@ -38,7 +38,7 @@ const Content = () => {
 
         <div className="content-container">
             
-            <BrowserRouter path="/">
+            <BrowserRouter path="/whatspoppin">
                 <Header 
                     searchInput={searchInput}
                     setSearchInput={setSearchInput}
@@ -61,7 +61,7 @@ const Content = () => {
                     setCurrentUserUID={setCurrentUserUID}
                 />
                 <Routes >
-                    <Route path="/" element={<HomeBoard 
+                    <Route path="/whatspoppin" element={<HomeBoard 
                                                 masterBoard={masterBoard}
                                                 setMasterBoard={setMasterBoard}
                                                 currentPost={currentPost}

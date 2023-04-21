@@ -15,7 +15,7 @@ const CreatePost = ({ setMasterBoard, setEntryMB, setVoteList, currentUserUID })
     const navigate = useNavigate();
 
     const homeRoute = () => {
-            navigate("/");
+            navigate("/whatspoppin");
     }
 
     const switchToTextInput = () => {
@@ -56,7 +56,7 @@ const CreatePost = ({ setMasterBoard, setEntryMB, setVoteList, currentUserUID })
         const comments = [];
         
         addPostToDataBase(currentUserUID, user, type, timePosted, voteAmount, title, content, comments, { setMasterBoard, setEntryMB,setVoteList });
-        navigate("/");
+        navigate("/whatspoppin");
     }
 
     return (
