@@ -498,6 +498,13 @@ a {
     inline-size: 80%;
     overflow-wrap: break-word;
 }
+@media screen and (max-width: 1441px) {
+    .comment-text {
+        margin-left: -15%;
+        inline-size: 65%;
+        overflow-wrap: break-word;
+    }
+}
 .search-options-container {
     display: flex;
     justify-content: center;
