@@ -1,0 +1,14 @@
+{
+  "files": {
+    "main.css": "/whatspoppin/static/css/main.a2db799d.css",
+    "main.js": "/whatspoppin/static/js/main.de18a99a.js",
+    "static/media/NEWS.png": "/whatspoppin/static/media/NEWS.3bb7421ad68f47d72630.png",
+    "index.html": "/whatspoppin/index.html",
+    "main.a2db799d.css.map": "/whatspoppin/static/css/main.a2db799d.css.map",
+    "main.de18a99a.js.map": "/whatspoppin/static/js/main.de18a99a.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.a2db799d.css",
+    "static/js/main.de18a99a.js"
+  ]
+}
