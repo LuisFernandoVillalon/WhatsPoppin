@@ -14,7 +14,7 @@ const Header = (props) => {
     const navigate = useNavigate();
 
     const homeRoute = () => {
-            navigate("/whatspoppin");
+            navigate("/WhatsPoppin");
     }
     const createPostRoute = () => {
         navigate("/create-post");

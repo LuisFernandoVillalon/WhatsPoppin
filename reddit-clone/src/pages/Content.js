@@ -17,11 +17,12 @@ const Content = () => {
     const [signUp, setSignUp] = useState(false);
     const [displayUserName, setDisplayUserName] = useState(localStorage.getItem("currentUser"));
     let temp = "";
-    if (localStorage.getItem("loginStatus") === "false") {
-        temp = false;
-    } else {
+    if (localStorage.getItem("loginStatus") === "true") {
         temp = true;
+    } else {
+        temp = false;
     }
+    console.log(temp);
     const [logInState, setLogInState] = useState(temp);
     const [entryMB, setEntryMB] = useState([]);
     const [currentUserUID, setCurrentUserUID] = useState("");
@@ -30,7 +31,11 @@ const Content = () => {
 
     useEffect(() => {
         getRecords({ setMasterBoard, setEntryMB, setVoteList});
-        setCurrentUserUID(localStorage.getItem("currentUserUID"));
+        if (localStorage.getItem("currentUserUID")) {
+            setCurrentUserUID(localStorage.getItem("currentUserUID"));
+        } else {
+            return;
+        }
     }, []);
 
     
@@ -38,7 +43,7 @@ const Content = () => {
 
         <div className="content-container">
             
-            <BrowserRouter path="/whatspoppin">
+            <BrowserRouter path="/WhatsPoppin">
                 <Header 
                     searchInput={searchInput}
                     setSearchInput={setSearchInput}
@@ -61,7 +66,7 @@ const Content = () => {
                     setCurrentUserUID={setCurrentUserUID}
                 />
                 <Routes >
-                    <Route path="/whatspoppin" element={<HomeBoard 
+                    <Route path="/WhatsPoppin" element={<HomeBoard 
                                                 masterBoard={masterBoard}
                                                 setMasterBoard={setMasterBoard}
                                                 currentPost={currentPost}

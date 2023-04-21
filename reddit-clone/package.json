@@ -1,6 +1,6 @@
 {
   "name": "reddit-clone",
-  "homepage": "http://luisfernandovillalon.github.io/whatspoppin",
+  "homepage": "http://luisfernandovillalon.github.io/WhatsPoppin",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
@@ -9,7 +9,6 @@
     "@testing-library/user-event": "^13.5.0",
     "bootstrap": "^5.2.3",
     "firebase": "^9.19.1",
-    "gh-pages": "^5.0.0",
     "react": "^18.2.0",
     "react-bootstrap": "^2.7.2",
     "react-bootstrap-icons": "^1.10.2",
@@ -44,5 +43,8 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "devDependencies": {
+    "gh-pages": "^5.0.0"
   }
 }

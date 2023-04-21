@@ -1,7 +1,7 @@
 import {  CaretUpFill, CaretDownFill, ChatSquare, BoxArrowUpRight, Link45deg } from 'react-bootstrap-icons'; 
 import { useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
-import { upVotePostFirebase, downVotePostFirebase, getRecords } from '../firebase-data/PostData';
+import { upVotePostFirebase, downVotePostFirebase } from '../firebase-data/PostData';
 import TimePosted from '../utilities/TimePosted';
 
 const directLink = (props) => {

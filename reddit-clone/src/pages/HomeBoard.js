@@ -1,4 +1,4 @@
-import { BarChartFill, PencilSquare, Newspaper, Clock, CaretUpFill, CaretDownFill, ChatSquare, BoxArrowUpRight, Link45deg } from 'react-bootstrap-icons'; 
+import { BarChartFill, PencilSquare, Newspaper, Clock} from 'react-bootstrap-icons'; 
 import useScrollBlock from "../utilities/useScrollBlock";
 import { useNavigate } from "react-router-dom";
 import uniqid from 'uniqid';
