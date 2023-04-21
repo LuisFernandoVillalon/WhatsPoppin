@@ -1,4 +1,5 @@
 export const topBoard = ({masterBoard, currentPost, setMasterBoard}, setCommentBoard) => {
+    console.log(masterBoard)
     masterBoard = Object.entries(masterBoard);
     const currPost = masterBoard.filter((post) => {
         return (post[1].id === currentPost.id) 

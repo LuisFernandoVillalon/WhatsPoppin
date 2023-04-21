@@ -3,13 +3,12 @@ import { useState, useRef, useEffect } from "react";
 import uniqid from 'uniqid';
 import { addReplyToFirebase, upVoteCommentFirebase, downVoteCommentFirebase, deleteCommentFromFirebase } from "../firebase-data/CommentData";
 import TimePosted from '../utilities/TimePosted';
-import { topBoard, newBoard, oldBoard } from "../utilities/HomeboardOptions";
+import { topBoard, newBoard, oldBoard } from "../utilities/CommentboardOptions";
 
 const CommentSection = ({
     currentPost, 
     masterBoard, 
     setCurrentPost, 
-    setLogIn, 
     setMasterBoard, 
     setSignUp, 
     logInState, 
@@ -26,7 +25,7 @@ const CommentSection = ({
     const updatedCurrentPost = tempMB.filter((currPost) => {
         if (currPost[1].id === currentPost.id) {
             return currPost;
-        }
+        } 
     });
     let currentCommentBoard = "";
     if (updatedCurrentPost.length === 0) {
@@ -66,13 +65,13 @@ const CommentSection = ({
         ))
     }
 
-
+console.log(masterBoard)
 
     return (
         <div className="comment-section-container">
             <div className="sortby-comments-container">
                 <p>SORT BY</p>
-                <select onChange={(e) => selectCommentBoard(e, {currentPost, masterBoard, setCurrentPost, setLogIn, setMasterBoard, setSignUp}, setCommentBoard)} className="sortby-comments" id="sortby-comments" >
+                <select onChange={(e) => selectCommentBoard(e, {currentPost, masterBoard, setMasterBoard}, setCommentBoard)} className="sortby-comments" id="sortby-comments" >
                     <option selected disabled>Choose Order</option>
                     <option value="top">TOP</option>
                     <option value="new">NEW</option>
@@ -120,7 +119,6 @@ const DisplayComments = ({
      const [commentVoteAmount, setCommentVoteAmount] = useState(response.voteAmount);
      const [downVoteStatus, setDownVoteStatus] = useState(false);
      const [upVoteStatus, setUpVoteStatus] = useState(false);
-     const [commentArray, setCommentArray] = useState([]);
      const [dltBtnStatus, setDltBtnStatus] = useState(false);
 
      const askUser = () => {
@@ -135,7 +133,7 @@ const DisplayComments = ({
      if (currentResponse === "") {
          responseStatus = false;
      } else {
-        if (currentResponse[0] == "") {
+        if (currentResponse[0] === "") {
             responseStatus = false;
         } else {
          responseStatus = true;
@@ -177,7 +175,6 @@ const DisplayComments = ({
                                 
                                 setUpVoteStatus(comment.upVoteState);
                                 setDownVoteStatus(comment.downVoteState);
-                                return;
                             }
                         }
                     })
@@ -221,7 +218,6 @@ const DisplayComments = ({
         let timePost = new Date();
         timePost = timePost.toISOString().split('T')[0];
         let voteAmount = 1; 
-        // let comments= [];
         const id = uniqid();
 
         addReplyToFirebase(user, id, timePost, voteAmount, text, response, currentPost, setMasterBoard, setVoteList, currentUserUID);

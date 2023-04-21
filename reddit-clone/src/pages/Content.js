@@ -78,8 +78,6 @@ const Content = () => {
                                                 setCurrentUserUID={setCurrentUserUID}
                                                 voteList={voteList}
                                                 setVoteList={setVoteList}
-                                                // downVoteList={downVoteList}
-                                                // setDownVoteList={setDownVoteList}
                                             />}
                     />
                     <Route path="/post" element={<Post 
@@ -94,8 +92,6 @@ const Content = () => {
                                                     entryMB={entryMB}
                                                     voteList={voteList}
                                                     setVoteList={setVoteList}
-                                                    // upVoteList={upVoteList}
-                                                    // downVoteList={downVoteList}
                                                 />}
                     />
                     <Route path="/create-post" element={<CreatePost 

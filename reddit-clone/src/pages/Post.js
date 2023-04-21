@@ -24,7 +24,6 @@ const Post = ({masterBoard,
                         currentPost={currentPost}
                         setCurrentPost={setCurrentPost}
                         logIn={logIn}
-                        setLogIn={setLogIn}
                         signUp={signUp}
                         setSignUp={setSignUp} 
                         logInState={logInState}
