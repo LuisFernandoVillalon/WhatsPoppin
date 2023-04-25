@@ -21,3 +21,9 @@ Understood the many features Firebase has to offer such as its authentication se
 across in this project was how render the nested replies to the comments on the posts. I knew how to set and the data structure but at the moment I was using
 Firebase's Realtime Database as a back-end service. So it became difficult to save the data and to call it as well. This is where I learned Firebase's Realtime Database is a bit outdated because it becomes difficult dealing with nested data. Firestore Database on the other hand allows you to work with nested data. I used recursion along
 side Firestore database to save and access the nested data that made the nested comment section on the application. 
+
+# Live Preview 
+
+
+https://user-images.githubusercontent.com/104875261/234381264-79d7f3cb-4b4c-4b43-99a9-ed910da69112.mp4
+
