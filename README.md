@@ -24,6 +24,5 @@ side Firestore database to save and access the nested data that made the nested 
 
 # Live Preview 
 
-
-https://user-images.githubusercontent.com/104875261/234381264-79d7f3cb-4b4c-4b43-99a9-ed910da69112.mp4
+[screen-capture (2).webm](https://user-images.githubusercontent.com/104875261/234381896-9c03869a-3e58-4c30-bc30-d2d948615312.webm)
 
