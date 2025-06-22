@@ -1,44 +1,66 @@
 import logo from "../assets/NEWS.png";
-import { X } from  'react-bootstrap-icons'; 
+import { X } from  'react-bootstrap-icons';
 import { useRef } from 'react';
 import { logInUser } from "../firebase-data/StartUpData";
 
 const LogInForm = (props) => {
     props.blockScroll();
-
+    
     const emailRef = useRef(undefined);
     const passwordRef = useRef(undefined);
-
-    const handleSubmit =  async (event) => {
+    
+    const handleSubmit = async (event) => {
         event.preventDefault();
-
-
+        
         const email = emailRef.current.value
         const password = passwordRef.current.value;
-
+        
         const user = await logInUser(email, password);
         localStorage.setItem("currentUserUID", user.uid);
         localStorage.setItem("loginStatus", true);
         localStorage.setItem("currentUser", user.displayName);
-
+        
         props.props.setDisplayUserName(localStorage.getItem("currentUser"));
         props.props.setLogInState(localStorage.getItem("loginStatus"));
         props.props.setLogIn(false);
         props.props.setSignUp(false);
         props.props.setCurrentUserUID(user);
         props.useScroll();
-
+        
         props.props.setMasterBoard(props.props.masterBoard)
         props.props.setVoteList(props.props.voteList)
         
-
         event.target.reset();
-    } 
-
+    }
+    
+    const handleTestLogin = async (event) => {
+        event.preventDefault();
+        
+        // Fill in test credentials
+        emailRef.current.value = "test_user_001";
+        passwordRef.current.value = "password123";
+        
+        // Trigger the login
+        const user = await logInUser("test_user_001", "password123");
+        localStorage.setItem("currentUserUID", user.uid);
+        localStorage.setItem("loginStatus", true);
+        localStorage.setItem("currentUser", user.displayName);
+        
+        props.props.setDisplayUserName(localStorage.getItem("currentUser"));
+        props.props.setLogInState(localStorage.getItem("loginStatus"));
+        props.props.setLogIn(false);
+        props.props.setSignUp(false);
+        props.props.setCurrentUserUID(user);
+        props.useScroll();
+        
+        props.props.setMasterBoard(props.props.masterBoard)
+        props.props.setVoteList(props.props.voteList)
+    }
+    
     const antiCloseForm = (e) => {
         e.stopPropagation();
-}
-
+    }
+    
     return (
         <div className="black-coat" onClick={() => closeForm(props)}>
             <form onSubmit={handleSubmit}>
@@ -50,6 +72,13 @@ const LogInForm = (props) => {
                         <input className="input-form" ref={emailRef} type="email" placeholder="Email"/>
                         <input className="input-form" ref={passwordRef} type="password" placeholder="Password" />
                         <button className="login-button-form">Log In</button>
+                        <button 
+                            type="button" 
+                            className="test-login-button"
+                            onClick={handleTestLogin}
+                        >
+                            Test Login
+                        </button>
                         <p className="small-text-form">
                             Don't have an account? 
                         <p className="small-text-form-blue" onClick={() => {switchToSignUpForm(props)}}>
