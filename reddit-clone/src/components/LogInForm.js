@@ -37,11 +37,11 @@ const LogInForm = (props) => {
         event.preventDefault();
         
         // Fill in test credentials
-        emailRef.current.value = "test_user_001";
+        emailRef.current.value = "test_user_001@email.com";
         passwordRef.current.value = "password123";
         
         // Trigger the login
-        const user = await logInUser("test_user_001", "password123");
+        const user = await logInUser("test_user_001@email.com", "password123");
         localStorage.setItem("currentUserUID", user.uid);
         localStorage.setItem("loginStatus", true);
         localStorage.setItem("currentUser", user.displayName);
@@ -74,16 +74,17 @@ const LogInForm = (props) => {
                         <button className="login-button-form">Log In</button>
                         <button 
                             type="button" 
-                            className="test-login-button"
+                            className="login-button-form"
                             onClick={handleTestLogin}
                         >
-                            Test Login
+                            Login w/ a Guest Account
                         </button>
                         <p className="small-text-form">
                             Don't have an account? 
-                        <p className="small-text-form-blue" onClick={() => {switchToSignUpForm(props)}}>
-                            SIGN UP
-                        </p></p>
+                            <p className="small-text-form-blue" onClick={() => {switchToSignUpForm(props)}}>
+                                SIGN UP
+                            </p>
+                        </p>
                     </div>
                 </div>
             </form>
